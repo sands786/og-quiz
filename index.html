@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OG Quiz — OpenGradient Knowledge Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="grid"></div>
+<div class="toast" id="toast"></div>
+<div class="confetti-wrap" id="confetti"></div>
+
+<!-- ═══════════════════════════════════════════════ LANDING ══ -->
+<div class="page" id="landing">
+
+  <div class="hero">
+    <div class="eyebrow"><span class="eyebrow-dot"></span>OpenGradient Knowledge Challenge</div>
+    <h1><span class="grad">OG Quiz</span></h1>
+    <p class="hero-sub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 ETH (testnet) to play.</p>
+    <div class="hero-badges">
+      <div class="badge"><span class="badge-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>25 Questions</div>
+      <div class="badge"><span class="badge-dot" style="background:var(--green);box-shadow:0 0 5px var(--green);"></span>7 Unique Ranks</div>
+      <div class="badge"><span class="badge-dot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta);"></span>0.1 ETH Testnet Entry</div>
+      <div class="badge"><span class="badge-dot" style="background:var(--purple);box-shadow:0 0 5px var(--purple);"></span>Chain ID: 10744</div>
+    </div>
+  </div>
+
+  <!-- RANKS -->
+  <div class="content-section">
+    <div class="section-title">// Rank System</div>
+    <div class="ranks-grid">
+      <div class="rank-card" style="border-color:rgba(255,230,0,.35);">
+        <div class="rank-emoji">🏆</div><div class="rank-name" style="color:var(--yellow);">OG Legend</div><div class="rank-range">23–25 correct</div>
+      </div>
+      <div class="rank-card" style="border-color:rgba(0,212,255,.35);">
+        <div class="rank-emoji">💎</div><div class="rank-name" style="color:var(--cyan);">Master Node</div><div class="rank-range">20–22 correct</div>
+      </div>
+      <div class="rank-card" style="border-color:rgba(184,41,247,.35);">
+        <div class="rank-emoji">🔮</div><div class="rank-name" style="color:var(--purple);">TEE Validator</div><div class="rank-range">17–19 correct</div>
+      </div>
+      <div class="rank-card" style="border-color:rgba(0,255,157,.35);">
+        <div class="rank-emoji">⛓️</div><div class="rank-name" style="color:var(--green);">On-Chain Dev</div><div class="rank-range">13–16 correct</div>
+      </div>
+      <div class="rank-card" style="border-color:rgba(255,107,0,.35);">
+        <div class="rank-emoji">🌐</div><div class="rank-name" style="color:var(--orange);">Inference Node</div><div class="rank-range">9–12 correct</div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-emoji">📡</div><div class="rank-name" style="color:var(--muted);">Testnet User</div><div class="rank-range">5–8 correct</div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-emoji">🌱</div><div class="rank-name" style="color:var(--muted);">Genesis Node</div><div class="rank-range">0–4 correct</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCS -->
+  <div class="content-section">
+    <div class="section-title">// Official Resources — Study Before You Play</div>
+    <div class="docs-grid">
+      <a href="https://docs.opengradient.ai/" target="_blank" class="doc-link"><div class="doc-link-icon">📚</div><div><div class="doc-link-label">Main Docs</div><div class="doc-link-name">docs.opengradient.ai</div></div></a>
+      <a href="https://docs.opengradient.ai/about/" target="_blank" class="doc-link"><div class="doc-link-icon">ℹ️</div><div><div class="doc-link-label">About</div><div class="doc-link-name">About OpenGradient</div></div></a>
+      <a href="https://docs.opengradient.ai/learn/architecture/" target="_blank" class="doc-link"><div class="doc-link-icon">🏗️</div><div><div class="doc-link-label">Architecture</div><div class="doc-link-name">HACA Deep Dive</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/" target="_blank" class="doc-link"><div class="doc-link-icon">🛠️</div><div><div class="doc-link-label">Developers</div><div class="doc-link-name">Build on OG</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/devnet.html" target="_blank" class="doc-link"><div class="doc-link-icon">🔗</div><div><div class="doc-link-label">Devnet Setup</div><div class="doc-link-name">Add OG to MetaMask</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/sdk/" target="_blank" class="doc-link"><div class="doc-link-icon">🐍</div><div><div class="doc-link-label">Python SDK</div><div class="doc-link-name">SDK Reference</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/agents/" target="_blank" class="doc-link"><div class="doc-link-icon">🤖</div><div><div class="doc-link-label">AI Agents</div><div class="doc-link-name">Agent Stack</div></div></a>
+      <a href="https://explorer.opengradient.ai" target="_blank" class="doc-link"><div class="doc-link-icon">🔍</div><div><div class="doc-link-label">Block Explorer</div><div class="doc-link-name">OG Explorer</div></div></a>
+      <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank" class="doc-link"><div class="doc-link-icon">🚰</div><div><div class="doc-link-label">Faucet</div><div class="doc-link-name">Get Testnet ETH</div></div></a>
+      <a href="https://github.com/OpenGradient" target="_blank" class="doc-link"><div class="doc-link-icon">⚙️</div><div><div class="doc-link-label">GitHub</div><div class="doc-link-name">OpenGradient Repos</div></div></a>
+      <a href="https://opengradient.ai" target="_blank" class="doc-link"><div class="doc-link-icon">🌐</div><div><div class="doc-link-label">Website</div><div class="doc-link-name">opengradient.ai</div></div></a>
+      <a href="https://docs.opengradient.ai/api_reference/python_sdk/" target="_blank" class="doc-link"><div class="doc-link-icon">📖</div><div><div class="doc-link-label">API Reference</div><div class="doc-link-name">Python API Docs</div></div></a>
+    </div>
+  </div>
+
+  <!-- WALLET / PAYMENT GATE -->
+  <div class="payment-gate">
+    <div class="payment-card">
+      <h2>🔐 Connect Wallet &amp; Pay Entry Fee</h2>
+      <p>Connect MetaMask, switch to <strong style="color:var(--cyan);">OpenGradient Testnet</strong> (Chain ID: 10744), then sign a transaction of <strong style="color:var(--yellow);">0.1 ETH</strong> to unlock the quiz.</p>
+
+      <!-- STEP 1: Connect -->
+      <div class="step" id="step-connect">
+        <div class="step-num">Step 1</div>
+        <button class="wallet-btn" id="connect-btn" onclick="connectWallet()">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="22" height="22" alt="MetaMask" style="filter:none;">
+          Connect MetaMask
+        </button>
+        <div id="wallet-status" class="wallet-status hidden"></div>
+      </div>
+
+      <!-- STEP 2: Switch Network -->
+      <div class="step hidden" id="step-network">
+        <div class="step-num">Step 2</div>
+        <button class="wallet-btn secondary" id="network-btn" onclick="switchNetwork()">
+          🔗 Switch to OpenGradient Testnet
+        </button>
+        <div class="network-info">
+          <span>Name: OpenGradient Testnet</span>
+          <span>Chain ID: 10744</span>
+          <span>RPC: eth-devnet.opengradient.ai</span>
+          <span>Symbol: ETH</span>
+        </div>
+      </div>
+
+      <!-- STEP 3: Pay -->
+      <div class="step hidden" id="step-pay">
+        <div class="step-num">Step 3</div>
+        <div class="opg-amount">
+          <div class="opg-icon">ETH</div>
+          <div class="opg-value">0.1</div>
+          <div class="opg-symbol">ETH (Testnet)</div>
+        </div>
+        <button class="wallet-btn green" id="pay-btn" onclick="payAndStart()">
+          💸 Pay 0.1 ETH &amp; Start Quiz →
+        </button>
+        <p class="pay-note">
+          Need testnet ETH? →
+          <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank">OG Faucet</a> &nbsp;|&nbsp;
+          <a href="https://docs.opengradient.ai/developers/devnet.html" target="_blank">Setup Guide</a>
+        </p>
+      </div>
+
+      <div class="divider-or">— or —</div>
+      <button class="demo-btn" onclick="startDemo()">▶ Try Demo Mode (Skip Payment)</button>
+    </div>
+  </div>
+
+</div><!-- end landing -->
+
+<!-- ═══════════════════════════════════════════════ QUIZ ══ -->
+<div class="quiz-container hidden" id="quiz-container">
+  <div class="quiz-header">
+    <div class="quiz-progress-wrap">
+      <div class="quiz-progress-label">
+        <span id="q-label">Question 1 / 25</span>
+        <span id="q-cat-label" style="color:var(--cyan);">—</span>
+      </div>
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill" style="width:4%;"></div></div>
+    </div>
+    <div class="quiz-score-chip">✓ <span id="score-live">0</span> correct</div>
+    <div class="quiz-timer" id="timer-chip">⏱ <span id="timer-val">30</span>s</div>
+  </div>
+  <div id="question-area"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ RESULTS ══ -->
+<div class="results hidden" id="results">
+  <div class="result-card" id="result-card"></div>
+</div>
+
+<script src="quiz.js"></script>
+</body>
+</html>
