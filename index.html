@@ -2,156 +2,435 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>OG Quiz — OpenGradient Knowledge Challenge</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<style>
+:root{--cyan:#00D4FF;--magenta:#FF00A0;--purple:#B829F7;--green:#00FF9D;--yellow:#FFE600;--orange:#FF6B00;--black:#050508;--dark:#0A0A0F;--surface:#111118;--surface2:#1a1a24;--border:#2a2a3a;--text:#e8e8f0;--muted:#6b6b80;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black);color:var(--text);-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--cyan),var(--purple));border-radius:2px;}
+#bgc{position:fixed;inset:0;z-index:0;}
+.gridlines{position:fixed;inset:0;z-index:1;background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;}
+.hidden{display:none!important;}
+.gtext{background:linear-gradient(90deg,var(--cyan),var(--magenta),var(--purple),var(--cyan));background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gs 3s ease infinite;}
+@keyframes gs{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--green);border-radius:8px;padding:8px 20px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--green);opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.er{border-color:#fc6c6c;color:#fc6c6c;}
+.cfw{position:fixed;inset:0;pointer-events:none;z-index:9998;}
+.cf{position:absolute;border-radius:2px;animation:cfall linear forwards;}
+@keyframes cfall{0%{transform:translateY(-20px) rotate(0);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+/* ── LANDING ── */
+.page{position:relative;z-index:10;}
+.hero{text-align:center;padding:60px 24px 40px;position:relative;overflow:hidden;}
+.hglow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(0,212,255,.09),transparent 70%);pointer-events:none;}
+.orb1{position:absolute;width:280px;height:280px;border-radius:50%;background:var(--cyan);filter:blur(80px);opacity:.06;top:-60px;left:-80px;animation:of 9s ease-in-out infinite;}
+.orb2{position:absolute;width:200px;height:200px;border-radius:50%;background:var(--purple);filter:blur(80px);opacity:.07;top:0;right:-50px;animation:of 7s ease-in-out infinite 2s;}
+@keyframes of{0%,100%{transform:translateY(0);}50%{transform:translateY(-20px);}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 16px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:20px;font-size:10px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.15em;color:var(--cyan);margin-bottom:22px;}
+.edot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:dp 2s ease-in-out infinite;}
+@keyframes dp{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;}}
+.hero h1{font-size:clamp(36px,6vw,66px);font-weight:900;letter-spacing:-.04em;line-height:1.04;margin-bottom:16px;}
+.hsub{font-size:15px;color:var(--muted);max-width:520px;margin:0 auto 28px;line-height:1.8;}
+.badges{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:40px;}
+.badge{display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:100px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);transition:all .3s;}
+.badge:hover{border-color:var(--cyan);color:var(--cyan);}
+.bdot{width:5px;height:5px;border-radius:50%;}
+
+.sec{max-width:960px;margin:0 auto 52px;padding:0 24px;}
+.slabel{font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.18em;color:var(--cyan);display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.slabel::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px;}
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;transition:all .3s;}
+.rcard:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,212,255,.08);}
+.remoji{font-size:26px;margin-bottom:8px;}
+.rname{font-size:11px;font-weight:700;margin-bottom:4px;}
+.rrange{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);}
+
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:10px;}
+.dlink{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);transition:all .3s;}
+.dlink:hover{border-color:var(--cyan);transform:translateX(3px);}
+.dicon{width:32px;height:32px;border-radius:8px;background:rgba(0,212,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.dlabel{font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px;}
+.dname{font-size:12px;font-weight:600;color:var(--cyan);}
+
+/* payment */
+.pgate{max-width:500px;margin:0 auto;padding:0 24px 80px;}
+.pcard{background:linear-gradient(135deg,rgba(0,212,255,.07),rgba(184,41,247,.07));border:1px solid rgba(0,212,255,.28);border-radius:20px;padding:34px;position:relative;overflow:hidden;}
+.pcard::before{content:'';position:absolute;top:-70px;right:-70px;width:240px;height:240px;background:radial-gradient(circle,rgba(0,212,255,.09),transparent 70%);pointer-events:none;}
+.pcard::after{content:'';position:absolute;bottom:-50px;left:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(184,41,247,.07),transparent 70%);pointer-events:none;}
+.pcard h2{font-size:19px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;text-align:center;}
+.pcard>p{font-size:12px;color:var(--muted);line-height:1.75;margin-bottom:26px;text-align:center;}
+.step{margin-bottom:22px;position:relative;z-index:1;}
+.snum{font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.snum::before{content:'';width:18px;height:1px;background:var(--border);}
+.wbtn{width:100%;padding:13px 16px;border-radius:12px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:10px;border:none;}
+.wbtn:disabled{opacity:.45;cursor:not-allowed;}
+.wbtn.primary{background:linear-gradient(135deg,var(--cyan),var(--purple));color:white;box-shadow:0 4px 20px rgba(0,212,255,.28);}
+.wbtn.primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,212,255,.45);}
+.wbtn.netbtn{background:linear-gradient(135deg,rgba(0,212,255,.14),rgba(184,41,247,.14));border:1px solid rgba(0,212,255,.3);color:var(--cyan);}
+.wbtn.netbtn:hover:not(:disabled){background:linear-gradient(135deg,rgba(0,212,255,.24),rgba(184,41,247,.24));}
+.wbtn.paybtn{background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--black);font-weight:800;box-shadow:0 4px 20px rgba(0,255,157,.25);}
+.wbtn.paybtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,255,157,.45);}
+.schip{margin-top:10px;padding:9px 14px;border-radius:9px;font-size:11px;font-family:'JetBrains Mono',monospace;text-align:center;display:none;}
+.schip.ok{background:rgba(0,255,157,.07);border:1px solid rgba(0,255,157,.25);color:var(--green);}
+.schip.bad{background:rgba(252,108,108,.07);border:1px solid rgba(252,108,108,.3);color:#fc6c6c;}
+.schip.vis{display:block;}
+.npills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.np{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:3px 10px;border-radius:6px;}
+.feerow{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 20px;background:rgba(255,230,0,.06);border:1px solid rgba(255,230,0,.18);border-radius:12px;margin-bottom:14px;}
+.feeico{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:8px;color:white;flex-shrink:0;}
+.feeval{font-size:28px;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--yellow);}
+.feesym{font-size:12px;font-weight:700;color:var(--muted);align-self:flex-end;padding-bottom:4px;}
+.paynote{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-top:10px;text-align:center;line-height:1.8;}
+.paynote a{color:var(--cyan);text-decoration:none;}.paynote a:hover{text-decoration:underline;}
+.divdr{text-align:center;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin:18px 0;}
+.demobtn{width:100%;padding:11px;background:transparent;border:1px solid rgba(0,255,157,.22);border-radius:10px;color:var(--green);font-size:12px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .3s;}
+.demobtn:hover{background:rgba(0,255,157,.07);border-color:rgba(0,255,157,.4);}
+
+/* ── QUIZ ── */
+.qwrap{position:relative;z-index:10;max-width:780px;margin:0 auto;padding:32px 24px 70px;}
+.qtop{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+.qpb{flex:1;min-width:200px;}
+.qpl{display:flex;justify-content:space-between;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-bottom:7px;}
+.qbar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.qfill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:3px;transition:width .55s ease;}
+.scchip{display:flex;align-items:center;gap:5px;padding:6px 14px;background:rgba(0,255,157,.09);border:1px solid rgba(0,255,157,.3);border-radius:20px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--green);white-space:nowrap;}
+.tchip{display:flex;align-items:center;gap:5px;padding:6px 14px;background:rgba(255,230,0,.07);border:1px solid rgba(255,230,0,.2);border-radius:20px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--yellow);white-space:nowrap;transition:all .3s;}
+.tchip.urg{background:rgba(252,108,108,.1);border-color:rgba(252,108,108,.35);color:#fc6c6c;animation:tp .5s ease-in-out infinite;}
+@keyframes tp{0%,100%{opacity:1;}50%{opacity:.55;}}
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:30px;animation:su .35s ease-out;}
+@keyframes su{from{opacity:0;transform:translateY(18px) scale(.97);}to{opacity:1;transform:none;}}
+.qcat{font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.14em;padding:3px 11px;border-radius:20px;display:inline-block;margin-bottom:10px;}
+.qnum{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-bottom:12px;}
+.qtxt{font-size:16px;font-weight:700;line-height:1.65;margin-bottom:22px;color:var(--text);}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{padding:14px 18px;background:var(--dark);border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;transition:all .22s;display:flex;align-items:center;gap:12px;text-align:left;color:var(--text);font-family:'Inter',sans-serif;width:100%;}
+.opt:hover:not(.lk){border-color:var(--cyan);background:rgba(0,212,255,.06);transform:translateX(5px);}
+.opt.ok{border-color:var(--green)!important;background:rgba(0,255,157,.09)!important;color:var(--green)!important;}
+.opt.ng{border-color:#fc6c6c!important;background:rgba(252,108,108,.07)!important;color:#fc6c6c!important;}
+.opt.lk{cursor:not-allowed;}
+.olet{width:26px;height:26px;min-width:26px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:700;transition:all .22s;}
+.opt.ok .olet{background:rgba(0,255,157,.18);color:var(--green);}
+.opt.ng .olet{background:rgba(252,108,108,.18);color:#fc6c6c;}
+.qfb{margin-top:16px;padding:13px 16px;border-radius:10px;font-size:12px;line-height:1.75;display:none;}
+.qfb.show{display:block;}
+.qfb.fok{background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.2);color:var(--green);}
+.qfb.fng{background:rgba(252,108,108,.06);border:1px solid rgba(252,108,108,.2);color:#fc6c6c;}
+.nxtbtn{margin-top:20px;width:100%;padding:13px;background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .3s;display:none;letter-spacing:.02em;}
+.nxtbtn.show{display:block;}.nxtbtn:hover{opacity:.88;transform:translateY(-1px);}
+
+/* ── RESULTS ── */
+.rwrap{position:relative;z-index:10;max-width:660px;margin:0 auto;padding:40px 24px 80px;}
+.rcard{background:linear-gradient(135deg,rgba(17,17,24,.98),rgba(26,26,36,.98));border:1px solid rgba(0,212,255,.2);border-radius:22px;padding:42px 36px;text-align:center;animation:su .5s ease-out;position:relative;overflow:hidden;}
+.rcard::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:400px;height:300px;background:radial-gradient(ellipse,rgba(0,212,255,.07),transparent 70%);pointer-events:none;}
+.remj{font-size:68px;display:block;margin-bottom:16px;animation:bi 1s ease-out;}
+@keyframes bi{0%{transform:scale(0);}60%{transform:scale(1.2);}100%{transform:scale(1);}}
+.rrname{font-size:26px;font-weight:900;letter-spacing:-.03em;margin-bottom:6px;}
+.rscore{font-size:54px;font-weight:900;font-family:'JetBrains Mono',monospace;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:6px;}
+.rsub{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-bottom:22px;}
+.txr{display:flex;align-items:center;gap:9px;padding:10px 14px;background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.2);border-radius:10px;margin-bottom:20px;}
+.txd{width:7px;height:7px;min-width:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:dp 2s ease-in-out infinite;}
+.txt2{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--green);text-align:left;flex:1;word-break:break-all;line-height:1.5;}
+.txt2 a{color:var(--cyan);text-decoration:underline dotted;}
+.rstats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+.rs{background:var(--dark);border:1px solid var(--border);border-radius:10px;padding:14px 10px;}
+.rsv{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.rsl{font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+.rmsg{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-align:left;}
+.rbtns{display:flex;flex-direction:column;gap:10px;}
+.rb{padding:12px;border-radius:10px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .3s;width:100%;text-decoration:none;display:block;text-align:center;}
+.rb.rp{background:linear-gradient(135deg,var(--cyan),var(--purple));border:none;color:white;}.rb.rp:hover{opacity:.88;transform:translateY(-1px);}
+.rb.rs2{background:transparent;border:1px solid var(--border);color:var(--muted);}.rb.rs2:hover{border-color:var(--cyan);color:var(--cyan);}
+
+@media(max-width:620px){
+  .hero h1{font-size:28px;}.rgrid{grid-template-columns:repeat(3,1fr);}
+  .qtop{flex-direction:column;align-items:stretch;}.rstats{grid-template-columns:1fr 1fr;}
+  .rcard{padding:28px 20px;}
+}
+</style>
 </head>
 <body>
-<canvas id="bg"></canvas>
-<div class="grid"></div>
+<canvas id="bgc"></canvas>
+<div class="gridlines"></div>
 <div class="toast" id="toast"></div>
-<div class="confetti-wrap" id="confetti"></div>
+<div class="cfw" id="cfw"></div>
 
-<!-- ═══════════════════════════════════════════════ LANDING ══ -->
+<!-- ═══════════════ LANDING ═══════════════ -->
 <div class="page" id="landing">
-
   <div class="hero">
-    <div class="eyebrow"><span class="eyebrow-dot"></span>OpenGradient Knowledge Challenge</div>
-    <h1><span class="grad">OG Quiz</span></h1>
-    <p class="hero-sub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 ETH (testnet) to play.</p>
-    <div class="hero-badges">
-      <div class="badge"><span class="badge-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>25 Questions</div>
-      <div class="badge"><span class="badge-dot" style="background:var(--green);box-shadow:0 0 5px var(--green);"></span>7 Unique Ranks</div>
-      <div class="badge"><span class="badge-dot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta);"></span>0.1 ETH Testnet Entry</div>
-      <div class="badge"><span class="badge-dot" style="background:var(--purple);box-shadow:0 0 5px var(--purple);"></span>Chain ID: 10744</div>
+    <div class="hglow"></div><div class="orb1"></div><div class="orb2"></div>
+    <div class="eyebrow"><span class="edot"></span>OpenGradient Knowledge Challenge</div>
+    <h1><span class="gtext">OG Quiz</span></h1>
+    <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 ETH (testnet) to play.</p>
+    <div class="badges">
+      <div class="badge"><span class="bdot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan)"></span>25 Questions</div>
+      <div class="badge"><span class="bdot" style="background:var(--green);box-shadow:0 0 5px var(--green)"></span>7 Unique Ranks</div>
+      <div class="badge"><span class="bdot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta)"></span>0.1 ETH Testnet Entry</div>
+      <div class="badge"><span class="bdot" style="background:var(--purple);box-shadow:0 0 5px var(--purple)"></span>Chain ID: 10744</div>
+      <div class="badge"><span class="bdot" style="background:var(--yellow);box-shadow:0 0 5px var(--yellow)"></span>30s Per Question</div>
     </div>
   </div>
 
-  <!-- RANKS -->
-  <div class="content-section">
-    <div class="section-title">// Rank System</div>
-    <div class="ranks-grid">
-      <div class="rank-card" style="border-color:rgba(255,230,0,.35);">
-        <div class="rank-emoji">🏆</div><div class="rank-name" style="color:var(--yellow);">OG Legend</div><div class="rank-range">23–25 correct</div>
-      </div>
-      <div class="rank-card" style="border-color:rgba(0,212,255,.35);">
-        <div class="rank-emoji">💎</div><div class="rank-name" style="color:var(--cyan);">Master Node</div><div class="rank-range">20–22 correct</div>
-      </div>
-      <div class="rank-card" style="border-color:rgba(184,41,247,.35);">
-        <div class="rank-emoji">🔮</div><div class="rank-name" style="color:var(--purple);">TEE Validator</div><div class="rank-range">17–19 correct</div>
-      </div>
-      <div class="rank-card" style="border-color:rgba(0,255,157,.35);">
-        <div class="rank-emoji">⛓️</div><div class="rank-name" style="color:var(--green);">On-Chain Dev</div><div class="rank-range">13–16 correct</div>
-      </div>
-      <div class="rank-card" style="border-color:rgba(255,107,0,.35);">
-        <div class="rank-emoji">🌐</div><div class="rank-name" style="color:var(--orange);">Inference Node</div><div class="rank-range">9–12 correct</div>
-      </div>
-      <div class="rank-card">
-        <div class="rank-emoji">📡</div><div class="rank-name" style="color:var(--muted);">Testnet User</div><div class="rank-range">5–8 correct</div>
-      </div>
-      <div class="rank-card">
-        <div class="rank-emoji">🌱</div><div class="rank-name" style="color:var(--muted);">Genesis Node</div><div class="rank-range">0–4 correct</div>
-      </div>
+  <div class="sec">
+    <div class="slabel">// Rank System</div>
+    <div class="rgrid">
+      <div class="rcard" style="border-color:rgba(255,230,0,.35)"><div class="remoji">🏆</div><div class="rname" style="color:var(--yellow)">OG Legend</div><div class="rrange">23–25 correct</div></div>
+      <div class="rcard" style="border-color:rgba(0,212,255,.35)"><div class="remoji">💎</div><div class="rname" style="color:var(--cyan)">Master Node</div><div class="rrange">20–22 correct</div></div>
+      <div class="rcard" style="border-color:rgba(184,41,247,.35)"><div class="remoji">🔮</div><div class="rname" style="color:var(--purple)">TEE Validator</div><div class="rrange">17–19 correct</div></div>
+      <div class="rcard" style="border-color:rgba(0,255,157,.35)"><div class="remoji">⛓️</div><div class="rname" style="color:var(--green)">On-Chain Dev</div><div class="rrange">13–16 correct</div></div>
+      <div class="rcard" style="border-color:rgba(255,107,0,.35)"><div class="remoji">🌐</div><div class="rname" style="color:var(--orange)">Inference Node</div><div class="rrange">9–12 correct</div></div>
+      <div class="rcard"><div class="remoji">📡</div><div class="rname" style="color:var(--muted)">Testnet User</div><div class="rrange">5–8 correct</div></div>
+      <div class="rcard"><div class="remoji">🌱</div><div class="rname" style="color:var(--muted)">Genesis Node</div><div class="rrange">0–4 correct</div></div>
     </div>
   </div>
 
-  <!-- DOCS -->
-  <div class="content-section">
-    <div class="section-title">// Official Resources — Study Before You Play</div>
-    <div class="docs-grid">
-      <a href="https://docs.opengradient.ai/" target="_blank" class="doc-link"><div class="doc-link-icon">📚</div><div><div class="doc-link-label">Main Docs</div><div class="doc-link-name">docs.opengradient.ai</div></div></a>
-      <a href="https://docs.opengradient.ai/about/" target="_blank" class="doc-link"><div class="doc-link-icon">ℹ️</div><div><div class="doc-link-label">About</div><div class="doc-link-name">About OpenGradient</div></div></a>
-      <a href="https://docs.opengradient.ai/learn/architecture/" target="_blank" class="doc-link"><div class="doc-link-icon">🏗️</div><div><div class="doc-link-label">Architecture</div><div class="doc-link-name">HACA Deep Dive</div></div></a>
-      <a href="https://docs.opengradient.ai/developers/" target="_blank" class="doc-link"><div class="doc-link-icon">🛠️</div><div><div class="doc-link-label">Developers</div><div class="doc-link-name">Build on OG</div></div></a>
-      <a href="https://docs.opengradient.ai/developers/devnet.html" target="_blank" class="doc-link"><div class="doc-link-icon">🔗</div><div><div class="doc-link-label">Devnet Setup</div><div class="doc-link-name">Add OG to MetaMask</div></div></a>
-      <a href="https://docs.opengradient.ai/developers/sdk/" target="_blank" class="doc-link"><div class="doc-link-icon">🐍</div><div><div class="doc-link-label">Python SDK</div><div class="doc-link-name">SDK Reference</div></div></a>
-      <a href="https://docs.opengradient.ai/developers/agents/" target="_blank" class="doc-link"><div class="doc-link-icon">🤖</div><div><div class="doc-link-label">AI Agents</div><div class="doc-link-name">Agent Stack</div></div></a>
-      <a href="https://explorer.opengradient.ai" target="_blank" class="doc-link"><div class="doc-link-icon">🔍</div><div><div class="doc-link-label">Block Explorer</div><div class="doc-link-name">OG Explorer</div></div></a>
-      <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank" class="doc-link"><div class="doc-link-icon">🚰</div><div><div class="doc-link-label">Faucet</div><div class="doc-link-name">Get Testnet ETH</div></div></a>
-      <a href="https://github.com/OpenGradient" target="_blank" class="doc-link"><div class="doc-link-icon">⚙️</div><div><div class="doc-link-label">GitHub</div><div class="doc-link-name">OpenGradient Repos</div></div></a>
-      <a href="https://opengradient.ai" target="_blank" class="doc-link"><div class="doc-link-icon">🌐</div><div><div class="doc-link-label">Website</div><div class="doc-link-name">opengradient.ai</div></div></a>
-      <a href="https://docs.opengradient.ai/api_reference/python_sdk/" target="_blank" class="doc-link"><div class="doc-link-icon">📖</div><div><div class="doc-link-label">API Reference</div><div class="doc-link-name">Python API Docs</div></div></a>
+  <div class="sec">
+    <div class="slabel">// Official Resources — Study Before You Play</div>
+    <div class="dgrid">
+      <a href="https://docs.opengradient.ai/" target="_blank" class="dlink"><div class="dicon">📚</div><div><div class="dlabel">Main Docs</div><div class="dname">docs.opengradient.ai</div></div></a>
+      <a href="https://docs.opengradient.ai/about/" target="_blank" class="dlink"><div class="dicon">ℹ️</div><div><div class="dlabel">About</div><div class="dname">About OpenGradient</div></div></a>
+      <a href="https://docs.opengradient.ai/learn/architecture/" target="_blank" class="dlink"><div class="dicon">🏗️</div><div><div class="dlabel">Architecture</div><div class="dname">HACA Deep Dive</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/" target="_blank" class="dlink"><div class="dicon">🛠️</div><div><div class="dlabel">Developers</div><div class="dname">Build on OG</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/devnet.html" target="_blank" class="dlink"><div class="dicon">🔗</div><div><div class="dlabel">Devnet Setup</div><div class="dname">Add OG to MetaMask</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/sdk/" target="_blank" class="dlink"><div class="dicon">🐍</div><div><div class="dlabel">Python SDK</div><div class="dname">SDK Reference</div></div></a>
+      <a href="https://docs.opengradient.ai/developers/agents/" target="_blank" class="dlink"><div class="dicon">🤖</div><div><div class="dlabel">AI Agents</div><div class="dname">Agent Stack</div></div></a>
+      <a href="https://explorer.opengradient.ai" target="_blank" class="dlink"><div class="dicon">🔍</div><div><div class="dlabel">Block Explorer</div><div class="dname">OG Explorer</div></div></a>
+      <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank" class="dlink"><div class="dicon">🚰</div><div><div class="dlabel">Faucet</div><div class="dname">Get Testnet ETH</div></div></a>
+      <a href="https://github.com/OpenGradient" target="_blank" class="dlink"><div class="dicon">⚙️</div><div><div class="dlabel">GitHub</div><div class="dname">OpenGradient Repos</div></div></a>
+      <a href="https://opengradient.ai" target="_blank" class="dlink"><div class="dicon">🌐</div><div><div class="dlabel">Website</div><div class="dname">opengradient.ai</div></div></a>
+      <a href="https://docs.opengradient.ai/api_reference/python_sdk/" target="_blank" class="dlink"><div class="dicon">📖</div><div><div class="dlabel">API Reference</div><div class="dname">Python API Docs</div></div></a>
     </div>
   </div>
 
-  <!-- WALLET / PAYMENT GATE -->
-  <div class="payment-gate">
-    <div class="payment-card">
+  <div class="pgate">
+    <div class="pcard">
       <h2>🔐 Connect Wallet &amp; Pay Entry Fee</h2>
-      <p>Connect MetaMask, switch to <strong style="color:var(--cyan);">OpenGradient Testnet</strong> (Chain ID: 10744), then sign a transaction of <strong style="color:var(--yellow);">0.1 ETH</strong> to unlock the quiz.</p>
-
-      <!-- STEP 1: Connect -->
-      <div class="step" id="step-connect">
-        <div class="step-num">Step 1</div>
-        <button class="wallet-btn" id="connect-btn" onclick="connectWallet()">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="22" height="22" alt="MetaMask" style="filter:none;">
+      <p>Connect MetaMask, switch to <strong style="color:var(--cyan)">OpenGradient Testnet</strong>, then sign a <strong style="color:var(--yellow)">0.1 ETH</strong> transaction to unlock the quiz.</p>
+      <div class="step" id="s1">
+        <div class="snum">Step 1 — Connect Wallet</div>
+        <button class="wbtn primary" id="cbtn" onclick="connectWallet()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg>
           Connect MetaMask
         </button>
-        <div id="wallet-status" class="wallet-status hidden"></div>
+        <div class="schip" id="wst"></div>
       </div>
-
-      <!-- STEP 2: Switch Network -->
-      <div class="step hidden" id="step-network">
-        <div class="step-num">Step 2</div>
-        <button class="wallet-btn secondary" id="network-btn" onclick="switchNetwork()">
-          🔗 Switch to OpenGradient Testnet
-        </button>
-        <div class="network-info">
-          <span>Name: OpenGradient Testnet</span>
-          <span>Chain ID: 10744</span>
-          <span>RPC: eth-devnet.opengradient.ai</span>
-          <span>Symbol: ETH</span>
+      <div class="step hidden" id="s2">
+        <div class="snum">Step 2 — Switch Network</div>
+        <button class="wbtn netbtn" id="nbtn" onclick="switchNet()">🔗 Switch to OpenGradient Testnet</button>
+        <div class="npills">
+          <span class="np">Name: OpenGradient Testnet</span>
+          <span class="np">Chain ID: 10744</span>
+          <span class="np">RPC: eth-devnet.opengradient.ai</span>
+          <span class="np">Symbol: ETH</span>
         </div>
       </div>
-
-      <!-- STEP 3: Pay -->
-      <div class="step hidden" id="step-pay">
-        <div class="step-num">Step 3</div>
-        <div class="opg-amount">
-          <div class="opg-icon">ETH</div>
-          <div class="opg-value">0.1</div>
-          <div class="opg-symbol">ETH (Testnet)</div>
+      <div class="step hidden" id="s3">
+        <div class="snum">Step 3 — Pay Entry Fee</div>
+        <div class="feerow">
+          <div class="feeico">ETH</div>
+          <div class="feeval">0.1</div>
+          <div class="feesym">ETH (Testnet)</div>
         </div>
-        <button class="wallet-btn green" id="pay-btn" onclick="payAndStart()">
-          💸 Pay 0.1 ETH &amp; Start Quiz →
-        </button>
-        <p class="pay-note">
-          Need testnet ETH? →
-          <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank">OG Faucet</a> &nbsp;|&nbsp;
-          <a href="https://docs.opengradient.ai/developers/devnet.html" target="_blank">Setup Guide</a>
-        </p>
+        <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay 0.1 ETH &amp; Start Quiz →</button>
+        <p class="paynote">Need testnet ETH? → <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank">OG Faucet</a> &nbsp;|&nbsp; <a href="https://docs.opengradient.ai/developers/devnet.html" target="_blank">Setup Guide</a></p>
       </div>
-
-      <div class="divider-or">— or —</div>
-      <button class="demo-btn" onclick="startDemo()">▶ Try Demo Mode (Skip Payment)</button>
+      <div class="divdr">— or —</div>
+      <button class="demobtn" onclick="startDemo()">▶ Try Demo Mode (Skip Payment)</button>
     </div>
   </div>
+</div>
 
-</div><!-- end landing -->
-
-<!-- ═══════════════════════════════════════════════ QUIZ ══ -->
-<div class="quiz-container hidden" id="quiz-container">
-  <div class="quiz-header">
-    <div class="quiz-progress-wrap">
-      <div class="quiz-progress-label">
-        <span id="q-label">Question 1 / 25</span>
-        <span id="q-cat-label" style="color:var(--cyan);">—</span>
-      </div>
-      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill" style="width:4%;"></div></div>
+<!-- ═══════════════ QUIZ ═══════════════ -->
+<div class="qwrap hidden" id="qwrap">
+  <div class="qtop">
+    <div class="qpb">
+      <div class="qpl"><span id="qlbl">Question 1 / 25</span><span id="qcat" style="color:var(--cyan)">—</span></div>
+      <div class="qbar"><div class="qfill" id="qfill" style="width:4%"></div></div>
     </div>
-    <div class="quiz-score-chip">✓ <span id="score-live">0</span> correct</div>
-    <div class="quiz-timer" id="timer-chip">⏱ <span id="timer-val">30</span>s</div>
+    <div class="scchip">✓ <span id="slive">0</span> correct</div>
+    <div class="tchip" id="tchip">⏱ <span id="tval">30</span>s</div>
   </div>
-  <div id="question-area"></div>
+  <div id="qa"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════ RESULTS ══ -->
-<div class="results hidden" id="results">
-  <div class="result-card" id="result-card"></div>
+<!-- ═══════════════ RESULTS ═══════════════ -->
+<div class="rwrap hidden" id="rwrap">
+  <div class="rcard" id="rc"></div>
 </div>
 
-<script src="quiz.js"></script>
+<script>
+const OGN={chainId:'0x29F8',chainName:'OpenGradient Testnet',rpcUrls:['https://eth-devnet.opengradient.ai'],nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},blockExplorerUrls:['https://explorer.opengradient.ai']};
+const FEE='0x16345785D8A0000';
+const TREAS='0x0000000000000000000000000000000000000001';
+let addr='',txh='',cq=0,sc=0,ans=[];
+let ti=null,tl=30;
+
+async function connectWallet(){
+  const b=document.getElementById('cbtn'),c=document.getElementById('wst');
+  if(!window.ethereum){showChip(c,'❌ MetaMask not detected. Install from metamask.io',1);return;}
+  b.disabled=1;b.textContent='⏳ Connecting...';
+  try{
+    const a=await ethereum.request({method:'eth_requestAccounts'});
+    addr=a[0];const s=addr.slice(0,6)+'...'+addr.slice(-4);
+    showChip(c,'✓ Connected: '+s,0);
+    b.textContent='✓ '+s;b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';
+    document.getElementById('s2').classList.remove('hidden');
+    toast('Wallet connected! Now switch to OG Testnet.');
+    ethereum.on('accountsChanged',x=>{if(!x.length)location.reload();else addr=x[0];});
+  }catch(e){b.disabled=0;b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg> Connect MetaMask';showChip(c,e.code===4001?'❌ Rejected':'❌ '+e.message,1);}
+}
+
+async function switchNet(){
+  const b=document.getElementById('nbtn');b.disabled=1;b.textContent='⏳ Switching...';
+  try{await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:OGN.chainId}]});onSwitched();}
+  catch(e){
+    if(e.code===4902||e.code===-32603){
+      try{await ethereum.request({method:'wallet_addEthereumChain',params:[OGN]});onSwitched();}
+      catch(e2){b.disabled=0;b.textContent='🔗 Switch to OpenGradient Testnet';toast('❌ '+e2.message,1);}
+    }else{b.disabled=0;b.textContent='🔗 Switch to OpenGradient Testnet';toast(e.code===4001?'❌ Rejected':'❌ '+e.message,1);}
+  }
+}
+function onSwitched(){const b=document.getElementById('nbtn');b.textContent='✓ On OpenGradient Testnet';b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';b.disabled=1;document.getElementById('s3').classList.remove('hidden');toast('✓ Switched to OpenGradient Testnet!');}
+
+async function payStart(){
+  const b=document.getElementById('pbtn');b.disabled=1;b.textContent='⏳ Confirm in MetaMask...';
+  try{
+    const cid=await ethereum.request({method:'eth_chainId'});
+    if(cid!==OGN.chainId){toast('❌ Switch to OG Testnet first',1);b.disabled=0;b.textContent='💸 Pay 0.1 ETH & Start Quiz →';return;}
+    const h=await ethereum.request({method:'eth_sendTransaction',params:[{from:addr,to:TREAS,value:FEE,gas:'0x5208'}]});
+    txh=h;b.textContent='⏳ Waiting for confirmation...';toast('Transaction sent! Confirming...');
+    await waitReceipt(h);
+    b.textContent='✓ Paid! Loading quiz...';b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';
+    toast('✓ 0.1 ETH paid! Quiz unlocked 🎉');setTimeout(()=>startQuiz(),1200);
+  }catch(e){b.disabled=0;b.textContent='💸 Pay 0.1 ETH & Start Quiz →';toast(e.code===4001?'❌ Transaction rejected':'❌ '+(e.message||'Unknown error'),1);}
+}
+async function waitReceipt(h,n=30){
+  for(let i=0;i<n;i++){
+    try{const r=await ethereum.request({method:'eth_getTransactionReceipt',params:[h]});if(r&&r.status==='0x1')return r;if(r&&r.status==='0x0')throw new Error('Reverted');}catch(e){if(e.message==='Reverted')throw e;}
+    await new Promise(r=>setTimeout(r,2000));
+  }return null;
+}
+
+function startDemo(){addr='0xDEMO';toast('Demo mode — no payment needed!');setTimeout(()=>startQuiz(),400);}
+
+function startQuiz(){document.getElementById('landing').style.display='none';document.getElementById('qwrap').classList.remove('hidden');cq=0;sc=0;ans=[];renderQ();}
+
+function renderQ(){
+  const q=QS[cq];
+  document.getElementById('qlbl').textContent=`Question ${cq+1} / ${QS.length}`;
+  document.getElementById('qcat').textContent=q.cat;
+  document.getElementById('slive').textContent=sc;
+  document.getElementById('qfill').style.width=`${(cq/QS.length)*100}%`;
+  startTimer();
+  document.getElementById('qa').innerHTML=`<div class="qcard">
+    <div class="qcat" style="background:${q.bg};color:${q.tc}">${q.cat}</div>
+    <div class="qnum">Q${cq+1} of ${QS.length}</div>
+    <div class="qtxt">${q.q}</div>
+    <div class="opts" id="opts">${q.o.map((o,i)=>`<button class="opt" id="o${i}" onclick="pick(${i})"><span class="olet">${String.fromCharCode(65+i)}</span>${o}</button>`).join('')}</div>
+    <div class="qfb" id="fb"></div>
+    <button class="nxtbtn" id="nxt" onclick="nextQ()">${cq<QS.length-1?'Next Question →':'See My Results 🏆'}</button>
+  </div>`;
+}
+
+function startTimer(){clearInterval(ti);tl=30;updT();ti=setInterval(()=>{tl--;updT();if(tl<=0){clearInterval(ti);timeUp();}},1000);}
+function updT(){document.getElementById('tval').textContent=tl;document.getElementById('tchip').classList.toggle('urg',tl<=8);}
+function timeUp(){lock();const q=QS[cq];document.getElementById('o'+q.a).classList.add('ok');ans.push({s:-1,c:0});const fb=document.getElementById('fb');fb.innerHTML=`⏰ Time's up! Correct: <strong>${q.o[q.a]}</strong>. ${q.ex}`;fb.className='qfb fng show';document.getElementById('nxt').classList.add('show');}
+function pick(i){clearInterval(ti);lock();const q=QS[cq],ok=i===q.a;document.getElementById('o'+i).classList.add(ok?'ok':'ng');if(!ok)document.getElementById('o'+q.a).classList.add('ok');if(ok)sc++;ans.push({s:i,c:ok});document.getElementById('slive').textContent=sc;const fb=document.getElementById('fb');fb.innerHTML=ok?`✅ Correct! ${q.ex}`:`❌ Correct answer: <strong>${q.o[q.a]}</strong>. ${q.ex}`;fb.className=`qfb ${ok?'fok':'fng'} show`;document.getElementById('nxt').classList.add('show');}
+function lock(){document.querySelectorAll('.opt').forEach(o=>{o.classList.add('lk');o.onclick=null;});}
+function nextQ(){cq++;if(cq>=QS.length)showRes();else renderQ();}
+
+function rank(s){
+  if(s>=23)return{e:'🏆',n:'OG Legend',c:'#FFE600',m:"Absolute OpenGradient expert! Every layer — HACA, TEE, SDK, investors. The OG ecosystem needs minds like yours."};
+  if(s>=20)return{e:'💎',n:'Master Node',c:'#00D4FF',m:"Outstanding! Deep knowledge of OG's tech and ecosystem. Ready to build serious dApps and agents on the network."};
+  if(s>=17)return{e:'🔮',n:'TEE Validator',c:'#B829F7',m:"Excellent! Strong knowledge of TEE architecture and tools. A few more deep dives and you'll be an OG Legend."};
+  if(s>=13)return{e:'⛓️',n:'On-Chain Dev',c:'#00FF9D',m:"Good showing! Solid OG knowledge. Revisit the architecture docs and SDK reference to level up."};
+  if(s>=9) return{e:'🌐',n:'Inference Node',c:'#FF6B00',m:"Decent start! Read the official docs, especially HACA architecture and developer guides."};
+  if(s>=5) return{e:'📡',n:'Testnet User',c:'#6b6b80',m:"Getting started! Head to docs.opengradient.ai and study before challenging yourself again."};
+  return        {e:'🌱',n:'Genesis Node',c:'#6b6b80',m:"Every expert starts somewhere! Read through the docs and try again. You've got this!"};
+}
+
+function showRes(){
+  clearInterval(ti);
+  document.getElementById('qwrap').classList.add('hidden');
+  document.getElementById('rwrap').classList.remove('hidden');
+  const r=rank(sc),pct=Math.round((sc/QS.length)*100);
+  const cor=ans.filter(a=>a.c).length,wr=ans.filter(a=>!a.c&&a.s!==-1).length,ms=ans.filter(a=>a.s===-1).length;
+  const sh=addr!=='0xDEMO'?addr.slice(0,6)+'...'+addr.slice(-4):'Demo Mode';
+  const txel=txh?`<div class="txr"><span class="txd"></span><div class="txt2">✓ On-chain tx: <a href="https://explorer.opengradient.ai/tx/${txh}" target="_blank">${txh.slice(0,18)}...</a></div></div>`:'';
+  document.getElementById('rc').innerHTML=`
+    <span class="remj">${r.e}</span>
+    <div class="rrname" style="color:${r.c}">${r.n}</div>
+    <div class="rscore">${sc} / ${QS.length}</div>
+    <div class="rsub">${pct}% accuracy · ${sh}</div>
+    ${txel}
+    <div class="rstats">
+      <div class="rs"><div class="rsv" style="color:var(--green)">${cor}</div><div class="rsl">Correct</div></div>
+      <div class="rs"><div class="rsv" style="color:#fc6c6c">${wr}</div><div class="rsl">Wrong</div></div>
+      <div class="rs"><div class="rsv" style="color:var(--yellow)">${ms}</div><div class="rsl">Timed Out</div></div>
+    </div>
+    <div class="rmsg">${r.m}</div>
+    <div class="rbtns">
+      <button class="rb rp" onclick="retry()">🔄 Retry Quiz</button>
+      <a href="https://docs.opengradient.ai/" target="_blank" class="rb rs2">📚 Study the Docs</a>
+      <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank" class="rb rs2">🚰 Get Testnet ETH</a>
+      <a href="https://explorer.opengradient.ai" target="_blank" class="rb rs2">🔍 OG Block Explorer</a>
+    </div>`;
+  if(sc>=20)confetti();
+}
+function retry(){document.getElementById('rwrap').classList.add('hidden');document.getElementById('landing').style.display='block';const b=document.getElementById('pbtn');b.disabled=0;b.textContent='💸 Pay 0.1 ETH & Start Quiz →';b.style.background='';b.style.color='';}
+
+function showChip(el,msg,err){el.textContent=msg;el.className='schip '+(err?'bad':'ok')+' vis';}
+function toast(msg,err=0){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' er':'')+' on';setTimeout(()=>t.classList.remove('on'),3200);}
+function confetti(){
+  const cols=['#00D4FF','#FF00A0','#B829F7','#00FF9D','#FFE600','#FF6B00'],w=document.getElementById('cfw');
+  for(let i=0;i<90;i++){const c=document.createElement('div');c.className='cf';c.style.cssText=`left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*6)]};width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;animation-duration:${Math.random()*2+2}s;animation-delay:${Math.random()*1.5}s;border-radius:${Math.random()>.5?'50%':'2px'}`;w.appendChild(c);setTimeout(()=>c.remove(),5000);}
+}
+
+// BG canvas
+(function(){
+  const cv=document.getElementById('bgc'),ctx=cv.getContext('2d');let P=[];
+  function rz(){cv.width=innerWidth;cv.height=innerHeight;}
+  function init(){const cs=['#00D4FF','#FF00A0','#B829F7','#00FF9D'];P=Array.from({length:20},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,sz:Math.random()*2+1,c:cs[Math.floor(Math.random()*4)],a:Math.random()*.35+.15}));}
+  function frame(){
+    ctx.fillStyle='rgba(5,5,8,0.12)';ctx.fillRect(0,0,cv.width,cv.height);
+    P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=cv.width;if(p.x>cv.width)p.x=0;if(p.y<0)p.y=cv.height;if(p.y>cv.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;});
+    P.forEach((p1,i)=>P.slice(i+1).forEach(p2=>{const dx=p1.x-p2.x,dy=p1.y-p2.y,d=Math.sqrt(dx*dx+dy*dy);if(d<140){ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.strokeStyle='#00D4FF';ctx.globalAlpha=(1-d/140)*.06;ctx.stroke();ctx.globalAlpha=1;}}));
+    requestAnimationFrame(frame);
+  }
+  window.addEventListener('resize',()=>{rz();init();});rz();init();frame();
+})();
+
+const QS=[
+  {cat:"Basics",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What is OpenGradient's primary mission?",o:["Build centralized AI cloud services","Create the first decentralized, verifiable AI infrastructure on-chain","Develop a new programming language for AI","Compete with OpenAI's GPT models"],a:1,ex:"OpenGradient's mission is to democratize AI by building the first permissionless, decentralized platform for AI model hosting, secure inference, agent execution, and dApp deployment — all fully verifiable on-chain."},
+  {cat:"Funding",bg:"rgba(255,230,0,.12)",tc:"#FFE600",q:"How much did OpenGradient raise in its seed round in October 2024?",o:["$2.5 million","$5 million","$8.5 million","$15 million"],a:2,ex:"OpenGradient raised $8.5M in a seed round led by a16z CSX with Coinbase Ventures, SV Angel, Foresight Ventures, and notable angel investors."},
+  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Which accelerator selected OpenGradient for its Fall 2024 cohort?",o:["Y Combinator","a16z CSX (Crypto Startup Accelerator)","Binance Labs","Draper Associates"],a:1,ex:"OpenGradient was selected for the a16z Crypto Startup Accelerator (CSX) Fall 2024 program in NYC. a16z CSX invests at least $500K in each selected company."},
+  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"What does HACA stand for in OpenGradient's architecture?",o:["High-Accuracy Chain Architecture","Heterogeneous AI Compute Architecture","Hybrid Autonomous Computing Array","Hierarchical AI Contract Architecture"],a:1,ex:"HACA stands for Heterogeneous AI Compute Architecture. It routes AI inference to the right hardware based on security and speed requirements."},
+  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"What technology provides cryptographic proof that AI inference ran inside a secure, unmodified enclave?",o:["Zero-Knowledge Proofs only","Trusted Execution Environments (TEE)","Homomorphic Encryption","Multi-Party Computation"],a:1,ex:"Trusted Execution Environments (TEE) are hardware-isolated secure enclaves that cryptographically sign every AI output, proving the model ran unmodified and untampered."},
+  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"What is the Chain ID of OpenGradient's testnet?",o:["1337","8453","10744","42161"],a:2,ex:"OpenGradient Testnet has Chain ID 10744 (0x29F8 in hex). The RPC URL is https://eth-devnet.opengradient.ai and the native currency symbol is ETH."},
+  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"What type of blockchain does OpenGradient use?",o:["Solana-compatible","Bitcoin Layer 2","EVM-compatible (Ethereum Virtual Machine)","Cosmos-based"],a:2,ex:"OpenGradient runs on an EVM-compatible blockchain, meaning developers can call AI models directly from Solidity smart contracts."},
+  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Which co-inventor of the Transformer architecture is an angel investor in OpenGradient?",o:["Yann LeCun","Geoffrey Hinton","Illia Polosukhin (NEAR founder)","Andrew Ng"],a:2,ex:"Illia Polosukhin, co-founder of NEAR Protocol, co-invented the Transformer architecture powering all modern LLMs — and is an angel investor in OpenGradient."},
+  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Balaji Srinivasan, an angel investor in OpenGradient, was previously best known as:",o:["CTO of Google","CTO of Coinbase","CEO of Ripple","Founder of Ethereum"],a:1,ex:"Balaji Srinivasan is the former CTO of Coinbase and author of 'The Network State'. He is one of OpenGradient's high-profile angel investors."},
+  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is MemSync in OpenGradient's ecosystem?",o:["A blockchain wallet","A long-term memory layer for AI with persistent context management","A DEX for tokens","A GPU rental marketplace"],a:1,ex:"MemSync is OpenGradient's long-term memory layer for AI. It provides a REST API for persistent context, fact extraction, semantic search — with cryptographic proof of authenticity."},
+  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is BitQuant in the OpenGradient ecosystem?",o:["A Bitcoin trading bot","An open-source AI agent framework for quantitative trading using on-chain ML models","A stablecoin","A block explorer"],a:1,ex:"BitQuant is OpenGradient's open-source AI agent framework for quant trading using on-chain ML models for market analytics and autonomous trade execution."},
+  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"In OpenGradient's HACA, what do Inference Nodes primarily do?",o:["Verify transaction signatures","Store blockchain state","Run AI model inference with specialized GPU hardware","Distribute token rewards"],a:2,ex:"Inference nodes are specialized for running AI models on GPU hardware. This separation of inference from verification is a core HACA design principle."},
+  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"Which verification methods does OpenGradient's HACA support?",o:["Only TEE-based","Only Zero-Knowledge Proofs","A spectrum: TEE attestations, ZKML, and cryptoeconomic security","Only on-chain re-execution"],a:2,ex:"HACA supports a full spectrum: TEE attestations, ZKML for mathematical certainty, and cryptoeconomic security. You can mix methods within a single transaction."},
+  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What programming language is the OpenGradient SDK currently available in?",o:["JavaScript only","Rust","Python (TypeScript in development)","Go"],a:2,ex:"The OpenGradient SDK is available for Python with a TypeScript version in development. It includes a Python library and CLI tool called 'opengradient'."},
+  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What is AlphaSense in OpenGradient's developer stack?",o:["A financial data API","A tool that wraps verifiable AI workflows to give AI agents powerful on-chain signals","A hardware monitoring dashboard","A smart contract auditing tool"],a:1,ex:"AlphaSense wraps verifiable AI workflows and exposes them as tools for AI agents — giving your agent superpowers with on-chain verified signals."},
+  {cat:"Basics",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What core problem does OpenGradient solve that centralized AI providers cannot?",o:["Faster response times","Complete cryptographic verifiability of every AI inference — proof outputs weren't tampered with","Lower API pricing","Better model quality"],a:1,ex:"With centralized AI you can't verify outputs. OpenGradient provides cryptographic proof of every single inference — something no centralized provider offers."},
+  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"What is the RPC URL for OpenGradient's developer testnet?",o:["https://rpc.opengradient.ai","https://eth-devnet.opengradient.ai","https://testnet.opengradient.io","https://api.og-chain.net"],a:1,ex:"The OpenGradient testnet RPC URL is https://eth-devnet.opengradient.ai — used when adding OG to MetaMask or initializing the Python SDK."},
+  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is the OpenGradient Model Hub?",o:["A GPU marketplace","A community model registry to discover, deploy, and monetize open-source AI models on-chain","An NFT collection","A smart contract audit service"],a:1,ex:"The Model Hub is OG's decentralized model repository. Think Hugging Face — but on-chain, permissionless, and with ownership attribution."},
+  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Sandeep Nailwal, an angel investor in OpenGradient, co-founded which blockchain project?",o:["Solana","Avalanche","Polygon","Arbitrum"],a:2,ex:"Sandeep Nailwal is co-founder of Polygon, one of Ethereum's largest L2 ecosystems. He invested in OpenGradient's seed round."},
+  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"Why does OpenGradient NOT ask every validator to re-run AI inferences?",o:["To save storage","AI inference is computationally expensive, requires GPUs, and is non-deterministic — making full re-execution impractical","Copyright concerns","Would slow token transfers"],a:1,ex:"Unlike simple transactions, AI inference costs orders of magnitude more, needs specialized GPUs, and is non-deterministic. Dedicated inference nodes run models; full nodes verify proofs."},
+  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What is x402 in OpenGradient's ecosystem?",o:["An internal error code","A payments protocol for the internet built on HTTP enabling verifiable LLM inference with payment flows","A transaction type","A smart contract name"],a:1,ex:"x402 is an HTTP-based payments protocol (originally from Coinbase) that OpenGradient uses as a gateway for verifiable LLM inference with payment flows built in."},
+  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is Neuro Stack in OpenGradient?",o:["A GPU hardware stack","Technology to spin up your own sovereign AI-enabled blockchain for agents or apps","A frontend UI kit","A staking mechanism"],a:1,ex:"Neuro Stack lets anyone deploy their own sovereign AI-enabled blockchain — ideal for building specialized chains for AI agents or AI-powered applications."},
+  {cat:"Basics",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What was OpenGradient's previous company name before rebranding?",o:["DeepChain Labs","Vanna Laboratories","Gradient Protocol","ChainML Inc"],a:1,ex:"OpenGradient was formerly known as Vanna Laboratories before rebranding. It was founded in New York City in 2023."},
+  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"The OpenGradient Agent Stack is compatible with which popular agent frameworks?",o:["Only OG's own framework","LangChain and OpenAI Swarm","TensorFlow and PyTorch","AutoGPT only"],a:1,ex:"The OG Agent Stack is compatible with LangChain and OpenAI Swarm, making it a plug-in replacement for centralized execution in existing agent setups."},
+  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"Which on-chain use cases does OpenGradient explicitly enable through verifiable AI?",o:["Only chatbots","Risk management, AMM optimization, AI agents, Sybil resistance, DeFi mechanism design — all cryptographically proven","Only image generation","Only text summarization"],a:1,ex:"OpenGradient enables high-stakes use cases: risk management, ML optimization, AI agents, Sybil resistance, DeFi, AMM optimization — all with cryptographic verifiability built-in."},
+];
+</script>
 </body>
 </html>
