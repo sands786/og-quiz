@@ -161,6 +161,18 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
   .qtop{flex-direction:column;align-items:stretch;}.rstats{grid-template-columns:1fr 1fr;}
   .rcard{padding:28px 20px;}
 }
+
+/* step tracker */
+.step-track{display:flex;align-items:center;justify-content:center;gap:0;margin:18px 0 6px;}
+.step-dot{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--muted);transition:all .4s;flex-shrink:0;}
+.step-dot.active{background:linear-gradient(135deg,var(--cyan),var(--purple));border-color:transparent;color:white;box-shadow:0 0 12px rgba(0,212,255,.4);}
+.step-dot.done{background:var(--green);border-color:transparent;color:var(--black);}
+.step-line{flex:1;height:2px;background:var(--border);max-width:60px;transition:all .4s;}
+.step-line.done{background:var(--green);}
+.step-labels{display:flex;justify-content:space-between;padding:0 4px;margin-bottom:18px;}
+.step-labels span{font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);width:28px;text-align:center;}
+.mm-hint{margin-top:10px;text-align:center;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);}
+.mm-hint a{color:var(--cyan);text-decoration:none;}.mm-hint a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -235,26 +247,46 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 
   <div class="pgate">
     <div class="pcard">
-      <h2>🔐 Connect Wallet &amp; Pay Entry Fee</h2>
-      <p>Connect MetaMask, switch to <strong style="color:var(--cyan)">OpenGradient Testnet</strong>, then send <strong style="color:var(--yellow)">0.1 $OPG</strong> testnet tokens via the transaction below to unlock the quiz.</p>
+      <h2>🔐 Sign In &amp; Pay Entry Fee</h2>
+      <p>Connect your MetaMask wallet, switch to <strong style="color:var(--cyan)">OpenGradient Testnet</strong>, and send <strong style="color:var(--yellow)">0.1 $OPG</strong> to unlock the quiz.</p>
+
+      <!-- PROGRESS TRACK -->
+      <div class="step-track">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step-dot" id="dot2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step-dot" id="dot3">3</div>
+      </div>
+      <div class="step-labels">
+        <span>Connect</span><span>Network</span><span>Pay</span>
+      </div>
+
+      <!-- STEP 1 -->
       <div class="step" id="s1">
         <div class="snum">Step 1 — Connect Wallet</div>
         <button class="wbtn primary" id="cbtn" onclick="connectWallet()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="22" height="22" style="border-radius:4px" onerror="this.style.display='none'"/>
           Connect MetaMask
         </button>
         <div class="schip" id="wst"></div>
+        <div class="mm-hint">Don't have MetaMask? <a href="https://metamask.io/download/" target="_blank">Install it free →</a></div>
       </div>
+
+      <!-- STEP 2 -->
       <div class="step hidden" id="s2">
         <div class="snum">Step 2 — Switch Network</div>
-        <button class="wbtn netbtn" id="nbtn" onclick="switchNet()">🔗 Switch to OpenGradient Testnet</button>
+        <button class="wbtn netbtn" id="nbtn" onclick="switchNet()">
+          <span style="font-size:16px">🔗</span> Switch to OpenGradient Testnet
+        </button>
         <div class="npills">
-          <span class="np">Name: OpenGradient Testnet</span>
           <span class="np">Chain ID: 10744</span>
           <span class="np">RPC: eth-devnet.opengradient.ai</span>
-          <span class="np">Token: $OPG (ERC-20)</span>
+          <span class="np">Symbol: ETH</span>
         </div>
       </div>
+
+      <!-- STEP 3 -->
       <div class="step hidden" id="s3">
         <div class="snum">Step 3 — Pay Entry Fee</div>
         <div class="feerow">
@@ -263,8 +295,9 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
           <div class="feesym">$OPG Testnet</div>
         </div>
         <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay 0.1 $OPG &amp; Start Quiz →</button>
-        <p class="paynote">Get $OPG testnet tokens → <a href="https://faucet.opengradient.ai/" target="_blank">faucet.opengradient.ai</a> (need ETH for gas too)</p>
+        <p class="paynote">Get $OPG testnet tokens → <a href="https://faucet.opengradient.ai/" target="_blank">faucet.opengradient.ai</a></p>
       </div>
+
       <div class="divdr">— or —</div>
       <button class="demobtn" onclick="startDemo()">▶ Try Demo Mode (Skip Payment)</button>
     </div>
@@ -298,56 +331,74 @@ let addr='',txh='',cq=0,sc=0,ans=[];
 let ti=null,tl=30;
 
 async function connectWallet(){
-  const b=document.getElementById('cbtn'),c=document.getElementById('wst');
+  const btn = document.getElementById('cbtn');
+  const chip = document.getElementById('wst');
 
-  // Check MetaMask installed
-  if(typeof window.ethereum==='undefined'||!window.ethereum.isMetaMask){
-    showChip(c,'❌ MetaMask not found. <a href="https://metamask.io/download/" target="_blank" style="color:var(--cyan)">Install MetaMask →</a>',1);
-    b.disabled=0; resetConnectBtn(); return;
+  // 1. No MetaMask at all
+  if(typeof window.ethereum === 'undefined'){
+    chip.innerHTML = '❌ MetaMask not installed. <a href="https://metamask.io/download/" target="_blank" style="color:#00D4FF;text-decoration:underline">Download here →</a>';
+    chip.className = 'schip bad vis';
+    return;
   }
 
-  // Check HTTPS (MetaMask won't work on file:// or http://)
-  if(location.protocol==='file:'){
-    showChip(c,'❌ Open this page via HTTPS (Vercel/localhost), not as a local file',1);
-    b.disabled=0; resetConnectBtn(); return;
-  }
+  // 2. Already pending — MetaMask has a queued request
+  // Just call eth_accounts first to see if already connected
+  try {
+    const existing = await window.ethereum.request({ method: 'eth_accounts' });
+    if(existing && existing.length > 0){
+      addr = existing[0];
+      onConnected(btn, chip, addr);
+      return;
+    }
+  } catch(_){}
 
-  b.disabled=1; b.textContent='⏳ Opening MetaMask...';
-  showChip(c,'👆 Check for the MetaMask popup — it may be behind your browser window',0);
+  // 3. Request connection
+  btn.disabled = true;
+  btn.textContent = '⏳ Check MetaMask popup...';
+  chip.textContent = '👆 A MetaMask popup should appear — approve it to continue';
+  chip.className = 'schip ok vis';
 
-  // Timeout so button doesn't get stuck if user ignores popup
-  const timeout = setTimeout(()=>{
-    b.disabled=0; resetConnectBtn();
-    showChip(c,'⏱ Timed out. Did MetaMask popup appear? Try again.',1);
-  }, 30000);
-
-  try{
-    // Wake up MetaMask first (helps when extension is sleeping)
-    try{ await window.ethereum.request({method:'wallet_requestPermissions',params:[{eth_accounts:{}}]}); }catch(_){}
-
-    const a=await ethereum.request({method:'eth_requestAccounts'});
-    clearTimeout(timeout);
-    addr=a[0];
-    const s=addr.slice(0,6)+'...'+addr.slice(-4);
-    showChip(c,'✓ Connected: '+s,0);
-    b.textContent='✓ '+s;
-    b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';
-    b.style.color='#050508';
-    document.getElementById('s2').classList.remove('hidden');
-    toast('✓ Wallet connected! Now switch to OG Testnet.');
-    ethereum.on('accountsChanged',x=>{if(!x.length)location.reload();else addr=x[0];});
-  }catch(e){
-    clearTimeout(timeout);
-    b.disabled=0; resetConnectBtn();
-    if(e.code===4001) showChip(c,'❌ You rejected the connection request',1);
-    else if(e.code===-32002) showChip(c,'⚠️ MetaMask is already waiting — check the extension icon in your browser toolbar',1);
-    else showChip(c,'❌ '+e.message,1);
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    addr = accounts[0];
+    onConnected(btn, chip, addr);
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = CONNECT_BTN_HTML;
+    if(err.code === 4001){
+      chip.textContent = '❌ Connection rejected. Click the button to try again.';
+      chip.className = 'schip bad vis';
+    } else if(err.code === -32002){
+      chip.innerHTML = '⚠️ MetaMask already has a pending request. Click the <strong>MetaMask icon</strong> in your browser toolbar and approve it.';
+      chip.className = 'schip bad vis';
+      // Auto-retry after user hopefully approves
+      btn.disabled = false;
+      btn.textContent = '🔄 Try Again';
+    } else {
+      chip.textContent = '❌ Error: ' + (err.message || 'Unknown error');
+      chip.className = 'schip bad vis';
+    }
   }
 }
 
-function resetConnectBtn(){
-  document.getElementById('cbtn').innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg> Connect MetaMask';
+function onConnected(btn, chip, address){
+  const short = address.slice(0,6) + '...' + address.slice(-4);
+  chip.textContent = '✓ Connected: ' + short;
+  chip.className = 'schip ok vis';
+  btn.textContent = '✓ ' + short;
+  btn.style.background = 'linear-gradient(135deg,#00FF9D,#00D4FF)';
+  btn.style.color = '#050508';
+  btn.disabled = false;
+  document.getElementById('s2').classList.remove('hidden');
+  advanceStep(1);
+  toast('✓ Wallet connected! Switch to OG Testnet next.');
+  window.ethereum.on('accountsChanged', accs => {
+    if(!accs.length) location.reload();
+    else addr = accs[0];
+  });
 }
+
+const CONNECT_BTN_HTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg> Connect MetaMask';
 
 async function switchNet(){
   const b=document.getElementById('nbtn');b.disabled=1;b.textContent='⏳ Switching...';
@@ -359,7 +410,7 @@ async function switchNet(){
     }else{b.disabled=0;b.textContent='🔗 Switch to OpenGradient Testnet';toast(e.code===4001?'❌ Rejected':'❌ '+e.message,1);}
   }
 }
-function onSwitched(){const b=document.getElementById('nbtn');b.textContent='✓ On OpenGradient Testnet';b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';b.disabled=1;document.getElementById('s3').classList.remove('hidden');toast('✓ Switched to OpenGradient Testnet!');}
+function onSwitched(){const b=document.getElementById('nbtn');b.textContent='✓ On OpenGradient Testnet';b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';b.disabled=1;document.getElementById('s3').classList.remove('hidden');advanceStep(2);toast('✓ Switched to OpenGradient Testnet!');}
 
 async function payStart(){
   const b=document.getElementById('pbtn');b.disabled=1;b.textContent='⏳ Confirm in MetaMask...';
@@ -459,6 +510,20 @@ function toast(msg,err=0){const t=document.getElementById('toast');t.textContent
 function confetti(){
   const cols=['#00D4FF','#FF00A0','#B829F7','#00FF9D','#FFE600','#FF6B00'],w=document.getElementById('cfw');
   for(let i=0;i<90;i++){const c=document.createElement('div');c.className='cf';c.style.cssText=`left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*6)]};width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;animation-duration:${Math.random()*2+2}s;animation-delay:${Math.random()*1.5}s;border-radius:${Math.random()>.5?'50%':'2px'}`;w.appendChild(c);setTimeout(()=>c.remove(),5000);}
+}
+
+// Step tracker
+function advanceStep(step){
+  for(let i=1;i<=3;i++){
+    const dot=document.getElementById('dot'+i);
+    if(i<step){dot.className='step-dot done';dot.textContent='✓';}
+    else if(i===step){dot.className='step-dot active';}
+    else{dot.className='step-dot';}
+  }
+  for(let i=1;i<=2;i++){
+    const line=document.getElementById('line'+i);
+    if(line) line.className='step-line'+(i<step?' done':'');
+  }
 }
 
 // BG canvas
