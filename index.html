@@ -323,7 +323,7 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 </div>
 
 <script>
-const OGN={chainId:'0x29F8',chainName:'OpenGradient Testnet',rpcUrls:['https://eth-devnet.opengradient.ai'],nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},blockExplorerUrls:['https://explorer.opengradient.ai']};
+const OGN={chainId:'0x29f8',chainName:'OpenGradient Testnet',rpcUrls:['https://eth-devnet.opengradient.ai'],nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},blockExplorerUrls:['https://explorer.opengradient.ai']};
 // $OPG ERC-20 token on OpenGradient Testnet — update when official contract published
 const OPG_TOKEN='0x1234567890123456789012345678901234567890'; // ← replace with real OPG contract
 const TREAS='0x0000000000000000000000000000000000000001'; // ← replace with your treasury wallet
@@ -402,7 +402,7 @@ const CONNECT_BTN_HTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="
 
 async function switchNet(){
   const b=document.getElementById('nbtn');b.disabled=1;b.textContent='⏳ Switching...';
-  try{await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:OGN.chainId}]});onSwitched();}
+  try{await ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:OGN.chainId.toLowerCase()}]});onSwitched();}
   catch(e){
     if(e.code===4902||e.code===-32603){
       try{await ethereum.request({method:'wallet_addEthereumChain',params:[OGN]});onSwitched();}
@@ -416,7 +416,7 @@ async function payStart(){
   const b=document.getElementById('pbtn');b.disabled=1;b.textContent='⏳ Confirm in MetaMask...';
   try{
     const cid=await ethereum.request({method:'eth_chainId'});
-    if(cid!==OGN.chainId){toast('❌ Switch to OG Testnet first',1);b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';return;}
+    if(cid.toLowerCase()!==OGN.chainId.toLowerCase()){toast('❌ Switch to OG Testnet first',1);b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';return;}
     // ERC-20 transfer(address,uint256) — send 10 OPG tokens to treasury
     // transfer selector: 0xa9059cbb
     const toAddr=TREAS.replace('0x','').padStart(64,'0');
