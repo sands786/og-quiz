@@ -165,11 +165,11 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
     <div class="hglow"></div><div class="orb1"></div><div class="orb2"></div>
     <div class="eyebrow"><span class="edot"></span>OpenGradient Knowledge Challenge</div>
     <h1><span class="gtext">OG Quiz</span></h1>
-    <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 ETH (testnet) to play.</p>
+    <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 $OPG testnet tokens to unlock.</p>
     <div class="badges">
       <div class="badge"><span class="bdot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan)"></span>25 Questions</div>
       <div class="badge"><span class="bdot" style="background:var(--green);box-shadow:0 0 5px var(--green)"></span>7 Unique Ranks</div>
-      <div class="badge"><span class="bdot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta)"></span>0.1 ETH Testnet Entry</div>
+      <div class="badge"><span class="bdot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta)"></span>0.1 $OPG Token Entry</div>
       <div class="badge"><span class="bdot" style="background:var(--purple);box-shadow:0 0 5px var(--purple)"></span>Chain ID: 10744</div>
       <div class="badge"><span class="bdot" style="background:var(--yellow);box-shadow:0 0 5px var(--yellow)"></span>30s Per Question</div>
     </div>
@@ -199,7 +199,7 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
       <a href="https://docs.opengradient.ai/developers/sdk/" target="_blank" class="dlink"><div class="dicon">🐍</div><div><div class="dlabel">Python SDK</div><div class="dname">SDK Reference</div></div></a>
       <a href="https://docs.opengradient.ai/developers/agents/" target="_blank" class="dlink"><div class="dicon">🤖</div><div><div class="dlabel">AI Agents</div><div class="dname">Agent Stack</div></div></a>
       <a href="https://explorer.opengradient.ai" target="_blank" class="dlink"><div class="dicon">🔍</div><div><div class="dlabel">Block Explorer</div><div class="dname">OG Explorer</div></div></a>
-      <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank" class="dlink"><div class="dicon">🚰</div><div><div class="dlabel">Faucet</div><div class="dname">Get Testnet ETH</div></div></a>
+      <a href="https://faucet.opengradient.ai/" target="_blank" class="dlink"><div class="dicon">🚰</div><div><div class="dlabel">Faucet</div><div class="dname">faucet.opengradient.ai</div></div></a>
       <a href="https://github.com/OpenGradient" target="_blank" class="dlink"><div class="dicon">⚙️</div><div><div class="dlabel">GitHub</div><div class="dname">OpenGradient Repos</div></div></a>
       <a href="https://opengradient.ai" target="_blank" class="dlink"><div class="dicon">🌐</div><div><div class="dlabel">Website</div><div class="dname">opengradient.ai</div></div></a>
       <a href="https://docs.opengradient.ai/api_reference/python_sdk/" target="_blank" class="dlink"><div class="dicon">📖</div><div><div class="dlabel">API Reference</div><div class="dname">Python API Docs</div></div></a>
@@ -209,7 +209,7 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
   <div class="pgate">
     <div class="pcard">
       <h2>🔐 Connect Wallet &amp; Pay Entry Fee</h2>
-      <p>Connect MetaMask, switch to <strong style="color:var(--cyan)">OpenGradient Testnet</strong>, then sign a <strong style="color:var(--yellow)">0.1 ETH</strong> transaction to unlock the quiz.</p>
+      <p>Connect MetaMask, switch to <strong style="color:var(--cyan)">OpenGradient Testnet</strong>, then send <strong style="color:var(--yellow)">0.1 $OPG</strong> testnet tokens via the transaction below to unlock the quiz.</p>
       <div class="step" id="s1">
         <div class="snum">Step 1 — Connect Wallet</div>
         <button class="wbtn primary" id="cbtn" onclick="connectWallet()">
@@ -225,18 +225,18 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
           <span class="np">Name: OpenGradient Testnet</span>
           <span class="np">Chain ID: 10744</span>
           <span class="np">RPC: eth-devnet.opengradient.ai</span>
-          <span class="np">Symbol: ETH</span>
+          <span class="np">Token: $OPG (ERC-20)</span>
         </div>
       </div>
       <div class="step hidden" id="s3">
         <div class="snum">Step 3 — Pay Entry Fee</div>
         <div class="feerow">
-          <div class="feeico">ETH</div>
+          <div class="feeico" style="font-size:7px">$OPG</div>
           <div class="feeval">0.1</div>
-          <div class="feesym">ETH (Testnet)</div>
+          <div class="feesym">$OPG Testnet</div>
         </div>
-        <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay 0.1 ETH &amp; Start Quiz →</button>
-        <p class="paynote">Need testnet ETH? → <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank">OG Faucet</a> &nbsp;|&nbsp; <a href="https://docs.opengradient.ai/developers/devnet.html" target="_blank">Setup Guide</a></p>
+        <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay 0.1 $OPG &amp; Start Quiz →</button>
+        <p class="paynote">Get $OPG testnet tokens → <a href="https://faucet.opengradient.ai/" target="_blank">faucet.opengradient.ai</a> (need ETH for gas too)</p>
       </div>
       <div class="divdr">— or —</div>
       <button class="demobtn" onclick="startDemo()">▶ Try Demo Mode (Skip Payment)</button>
@@ -264,8 +264,9 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 
 <script>
 const OGN={chainId:'0x29F8',chainName:'OpenGradient Testnet',rpcUrls:['https://eth-devnet.opengradient.ai'],nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},blockExplorerUrls:['https://explorer.opengradient.ai']};
-const FEE='0x16345785D8A0000';
-const TREAS='0x0000000000000000000000000000000000000001';
+// $OPG ERC-20 token on OpenGradient Testnet — update when official contract published
+const OPG_TOKEN='0x1234567890123456789012345678901234567890'; // ← replace with real OPG contract
+const TREAS='0x0000000000000000000000000000000000000001'; // ← replace with your treasury wallet
 let addr='',txh='',cq=0,sc=0,ans=[];
 let ti=null,tl=30;
 
@@ -300,13 +301,19 @@ async function payStart(){
   const b=document.getElementById('pbtn');b.disabled=1;b.textContent='⏳ Confirm in MetaMask...';
   try{
     const cid=await ethereum.request({method:'eth_chainId'});
-    if(cid!==OGN.chainId){toast('❌ Switch to OG Testnet first',1);b.disabled=0;b.textContent='💸 Pay 0.1 ETH & Start Quiz →';return;}
-    const h=await ethereum.request({method:'eth_sendTransaction',params:[{from:addr,to:TREAS,value:FEE,gas:'0x5208'}]});
+    if(cid!==OGN.chainId){toast('❌ Switch to OG Testnet first',1);b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';return;}
+    // ERC-20 transfer(address,uint256) — send 10 OPG tokens to treasury
+    // transfer selector: 0xa9059cbb
+    const toAddr=TREAS.replace('0x','').padStart(64,'0');
+    const amount=BigInt('100000000000000000'); // 0.1 OPG (18 decimals)
+    const amountHex=amount.toString(16).padStart(64,'0');
+    const data='0xa9059cbb'+toAddr+amountHex;
+    const h=await ethereum.request({method:'eth_sendTransaction',params:[{from:addr,to:OPG_TOKEN,data:data,gas:'0x186A0'}]});
     txh=h;b.textContent='⏳ Waiting for confirmation...';toast('Transaction sent! Confirming...');
     await waitReceipt(h);
     b.textContent='✓ Paid! Loading quiz...';b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';
-    toast('✓ 0.1 ETH paid! Quiz unlocked 🎉');setTimeout(()=>startQuiz(),1200);
-  }catch(e){b.disabled=0;b.textContent='💸 Pay 0.1 ETH & Start Quiz →';toast(e.code===4001?'❌ Transaction rejected':'❌ '+(e.message||'Unknown error'),1);}
+    toast('✓ 0.1 $OPG paid! Quiz unlocked 🎉');setTimeout(()=>startQuiz(),1200);
+  }catch(e){b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';toast(e.code===4001?'❌ Transaction rejected':'❌ '+(e.message||'Unknown error'),1);}
 }
 async function waitReceipt(h,n=30){
   for(let i=0;i<n;i++){
@@ -376,12 +383,12 @@ function showRes(){
     <div class="rbtns">
       <button class="rb rp" onclick="retry()">🔄 Retry Quiz</button>
       <a href="https://docs.opengradient.ai/" target="_blank" class="rb rs2">📚 Study the Docs</a>
-      <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank" class="rb rs2">🚰 Get Testnet ETH</a>
+      <a href="https://faucet.opengradient.ai/" target="_blank" class="rb rs2">🚰 Get $OPG Testnet Tokens</a>
       <a href="https://explorer.opengradient.ai" target="_blank" class="rb rs2">🔍 OG Block Explorer</a>
     </div>`;
   if(sc>=20)confetti();
 }
-function retry(){document.getElementById('rwrap').classList.add('hidden');document.getElementById('landing').style.display='block';const b=document.getElementById('pbtn');b.disabled=0;b.textContent='💸 Pay 0.1 ETH & Start Quiz →';b.style.background='';b.style.color='';}
+function retry(){document.getElementById('rwrap').classList.add('hidden');document.getElementById('landing').style.display='block';const b=document.getElementById('pbtn');b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';b.style.background='';b.style.color='';}
 
 function showChip(el,msg,err){el.textContent=msg;el.className='schip '+(err?'bad':'ok')+' vis';}
 function toast(msg,err=0){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' er':'')+' on';setTimeout(()=>t.classList.remove('on'),3200);}
