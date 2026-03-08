@@ -204,11 +204,11 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
   </div>
   <div class="eyebrow"><span class="edot"></span>OpenGradient Knowledge Challenge</div>
     <h1><span class="gtext">OG Quiz</span></h1>
-    <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 $OPG testnet tokens to unlock.</p>
+    <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 ETH on OG Testnet to unlock.</p>
     <div class="badges">
       <div class="badge"><span class="bdot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan)"></span>25 Questions</div>
       <div class="badge"><span class="bdot" style="background:var(--green);box-shadow:0 0 5px var(--green)"></span>7 Unique Ranks</div>
-      <div class="badge"><span class="bdot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta)"></span>0.1 $OPG Token Entry</div>
+      <div class="badge"><span class="bdot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta)"></span>0.1 ETH (OG Testnet)</div>
       <div class="badge"><span class="bdot" style="background:var(--purple);box-shadow:0 0 5px var(--purple)"></span>Chain ID: 10744</div>
       <div class="badge"><span class="bdot" style="background:var(--yellow);box-shadow:0 0 5px var(--yellow)"></span>30s Per Question</div>
     </div>
@@ -290,12 +290,12 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
       <div class="step hidden" id="s3">
         <div class="snum">Step 3 — Pay Entry Fee</div>
         <div class="feerow">
-          <div class="feeico" style="font-size:7px">$OPG</div>
+          <div class="feeico" style="font-size:8px;font-weight:900">ETH</div>
           <div class="feeval">0.1</div>
-          <div class="feesym">$OPG Testnet</div>
+          <div class="feesym">ETH (OG Testnet)</div>
         </div>
-        <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay 0.1 $OPG &amp; Start Quiz →</button>
-        <p class="paynote">Get $OPG testnet tokens → <a href="https://faucet.opengradient.ai/" target="_blank">faucet.opengradient.ai</a></p>
+        <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay 0.1 ETH &amp; Start Quiz →</button>
+        <p class="paynote">Need testnet ETH? → <a href="https://faucet.opengradient.ai/" target="_blank">faucet.opengradient.ai</a></p>
       </div>
 
       <div class="divdr">— or —</div>
@@ -324,9 +324,8 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 
 <script>
 const OGN={chainId:'0x29f8',chainName:'OpenGradient Testnet',rpcUrls:['https://eth-devnet.opengradient.ai'],nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},blockExplorerUrls:['https://explorer.opengradient.ai']};
-// $OPG ERC-20 token on OpenGradient Testnet — update when official contract published
-const OPG_TOKEN='0x1234567890123456789012345678901234567890'; // ← replace with real OPG contract
-const TREAS='0x0000000000000000000000000000000000000001'; // ← replace with your treasury wallet
+// Treasury wallet — replace with your own address to receive entry fees
+const TREAS = '0x0000000000000000000000000000000000000001';
 let addr='',txh='',cq=0,sc=0,ans=[];
 let ti=null,tl=30;
 
@@ -413,22 +412,49 @@ async function switchNet(){
 function onSwitched(){const b=document.getElementById('nbtn');b.textContent='✓ On OpenGradient Testnet';b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';b.disabled=1;document.getElementById('s3').classList.remove('hidden');advanceStep(2);toast('✓ Switched to OpenGradient Testnet!');}
 
 async function payStart(){
-  const b=document.getElementById('pbtn');b.disabled=1;b.textContent='⏳ Confirm in MetaMask...';
-  try{
-    const cid=await ethereum.request({method:'eth_chainId'});
-    if(cid.toLowerCase()!==OGN.chainId.toLowerCase()){toast('❌ Switch to OG Testnet first',1);b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';return;}
-    // ERC-20 transfer(address,uint256) — send 10 OPG tokens to treasury
-    // transfer selector: 0xa9059cbb
-    const toAddr=TREAS.replace('0x','').padStart(64,'0');
-    const amount=BigInt('100000000000000000'); // 0.1 OPG (18 decimals)
-    const amountHex=amount.toString(16).padStart(64,'0');
-    const data='0xa9059cbb'+toAddr+amountHex;
-    const h=await ethereum.request({method:'eth_sendTransaction',params:[{from:addr,to:OPG_TOKEN,data:data,gas:'0x186A0'}]});
-    txh=h;b.textContent='⏳ Waiting for confirmation...';toast('Transaction sent! Confirming...');
+  const b = document.getElementById('pbtn');
+  b.disabled = true;
+  b.textContent = '⏳ Confirm in MetaMask...';
+
+  try {
+    const cid = await ethereum.request({ method: 'eth_chainId' });
+    if(cid.toLowerCase() !== OGN.chainId.toLowerCase()){
+      toast('❌ Switch to OG Testnet first', true);
+      b.disabled = false;
+      b.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
+      return;
+    }
+
+    // Send 0.1 native ETH as entry fee on OG Testnet
+    const h = await ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [{
+        from: addr,
+        to: TREAS,
+        value: '0x16345785D8A0000', // 0.1 ETH in wei
+        gas: '0x5208'               // 21000 — standard ETH transfer
+      }]
+    });
+
+    txh = h;
+    b.textContent = '⏳ Confirming on-chain...';
+    toast('✅ Transaction sent! Waiting for confirmation...');
+
     await waitReceipt(h);
-    b.textContent='✓ Paid! Loading quiz...';b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';
-    toast('✓ 0.1 $OPG paid! Quiz unlocked 🎉');setTimeout(()=>startQuiz(),1200);
-  }catch(e){b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';toast(e.code===4001?'❌ Transaction rejected':'❌ '+(e.message||'Unknown error'),1);}
+
+    b.textContent = '✓ Entry paid! Loading quiz...';
+    b.style.background = 'linear-gradient(135deg,#00FF9D,#00D4FF)';
+    b.style.color = '#050508';
+    toast('🎉 Entry fee paid! Quiz unlocked!');
+    setTimeout(() => startQuiz(), 1200);
+
+  } catch(e) {
+    b.disabled = false;
+    b.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
+    if(e.code === 4001)      toast('❌ Transaction rejected by user', true);
+    else if(e.code === -32603) toast('❌ Not enough ETH for gas. Get some from the faucet.', true);
+    else                      toast('❌ ' + (e.message || 'Unknown error'), true);
+  }
 }
 async function waitReceipt(h,n=30){
   for(let i=0;i<n;i++){
@@ -503,7 +529,7 @@ function showRes(){
     </div>`;
   if(sc>=20)confetti();
 }
-function retry(){document.getElementById('rwrap').classList.add('hidden');document.getElementById('landing').style.display='block';const b=document.getElementById('pbtn');b.disabled=0;b.textContent='💸 Pay 0.1 $OPG & Start Quiz →';b.style.background='';b.style.color='';}
+function retry(){document.getElementById('rwrap').classList.add('hidden');document.getElementById('landing').style.display='block';const b=document.getElementById('pbtn');b.disabled=0;b.textContent='💸 Pay 0.1 ETH & Start Quiz →';b.style.background='';b.style.color='';}
 
 function showChip(el,msg,err){el.textContent=msg;el.className='schip '+(err?'bad':'ok')+' vis';}
 function toast(msg,err=0){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' er':'')+' on';setTimeout(()=>t.classList.remove('on'),3200);}
