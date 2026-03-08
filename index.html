@@ -204,11 +204,11 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
   </div>
   <div class="eyebrow"><span class="edot"></span>OpenGradient Knowledge Challenge</div>
     <h1><span class="gtext">OG Quiz</span></h1>
-    <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 ETH on OG Testnet to unlock.</p>
+    <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 ETH entry fee on OG Testnet to unlock.</p>
     <div class="badges">
       <div class="badge"><span class="bdot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan)"></span>25 Questions</div>
       <div class="badge"><span class="bdot" style="background:var(--green);box-shadow:0 0 5px var(--green)"></span>7 Unique Ranks</div>
-      <div class="badge"><span class="bdot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta)"></span>0.1 ETH (OG Testnet)</div>
+      <div class="badge"><span class="bdot" style="background:var(--magenta);box-shadow:0 0 5px var(--magenta)"></span>0.1 ETH Entry Fee</div>
       <div class="badge"><span class="bdot" style="background:var(--purple);box-shadow:0 0 5px var(--purple)"></span>Chain ID: 10744</div>
       <div class="badge"><span class="bdot" style="background:var(--yellow);box-shadow:0 0 5px var(--yellow)"></span>30s Per Question</div>
     </div>
@@ -288,14 +288,14 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 
       <!-- STEP 3 -->
       <div class="step hidden" id="s3">
-        <div class="snum">Step 3 — Pay Entry Fee</div>
+        <div class="snum">Step 3 — Pay Entry Fee (OG Testnet)</div>
         <div class="feerow">
-          <div class="feeico" style="font-size:8px;font-weight:900">ETH</div>
+          <div class="feeico" style="font-size:9px;font-weight:900">0.1</div>
           <div class="feeval">0.1</div>
-          <div class="feesym">ETH (OG Testnet)</div>
+          <div class="feesym">ETH · OG Testnet</div>
         </div>
-        <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay 0.1 ETH &amp; Start Quiz →</button>
-        <p class="paynote">Need testnet ETH? → <a href="https://faucet.opengradient.ai/" target="_blank">faucet.opengradient.ai</a></p>
+        <button class="wbtn paybtn" id="pbtn" onclick="payStart()">💸 Pay Entry Fee &amp; Start Quiz →</button>
+        <p class="paynote">Get testnet ETH → <a href="https://faucet.opengradient.ai/" target="_blank">OG Faucet</a> &nbsp;|&nbsp; <a href="https://docs.opengradient.ai/developers/" target="_blank">Docs</a></p>
       </div>
 
       <div class="divdr">— or —</div>
@@ -324,7 +324,7 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 
 <script>
 const OGN={chainId:'0x29f8',chainName:'OpenGradient Testnet',rpcUrls:['https://eth-devnet.opengradient.ai'],nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},blockExplorerUrls:['https://explorer.opengradient.ai']};
-// Treasury wallet — replace with your own address to receive entry fees
+// Treasury wallet — replace with YOUR wallet address to receive entry fees
 const TREAS = '0x0000000000000000000000000000000000000001';
 let addr='',txh='',cq=0,sc=0,ans=[];
 let ti=null,tl=30;
@@ -417,29 +417,29 @@ async function payStart(){
   b.textContent = '⏳ Confirm in MetaMask...';
 
   try {
+    // Verify still on OG testnet
     const cid = await ethereum.request({ method: 'eth_chainId' });
     if(cid.toLowerCase() !== OGN.chainId.toLowerCase()){
-      toast('❌ Switch to OG Testnet first', true);
+      toast('❌ Please switch back to OpenGradient Testnet', true);
       b.disabled = false;
-      b.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
+      b.textContent = '💸 Pay Entry Fee & Start Quiz →';
       return;
     }
 
-    // Send 0.1 native ETH as entry fee on OG Testnet
+    // Send 0.1 ETH on OG testnet as entry fee
     const h = await ethereum.request({
       method: 'eth_sendTransaction',
       params: [{
         from: addr,
         to: TREAS,
         value: '0x16345785D8A0000', // 0.1 ETH in wei
-        gas: '0x5208'               // 21000 — standard ETH transfer
+        gas: '0x5208'
       }]
     });
 
     txh = h;
     b.textContent = '⏳ Confirming on-chain...';
-    toast('✅ Transaction sent! Waiting for confirmation...');
-
+    toast('✅ Transaction sent! Confirming...');
     await waitReceipt(h);
 
     b.textContent = '✓ Entry paid! Loading quiz...';
@@ -450,10 +450,10 @@ async function payStart(){
 
   } catch(e) {
     b.disabled = false;
-    b.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
-    if(e.code === 4001)      toast('❌ Transaction rejected by user', true);
-    else if(e.code === -32603) toast('❌ Not enough ETH for gas. Get some from the faucet.', true);
-    else                      toast('❌ ' + (e.message || 'Unknown error'), true);
+    b.textContent = '💸 Pay Entry Fee & Start Quiz →';
+    if(e.code === 4001) toast('❌ Transaction rejected', true);
+    else if(e.code === -32603) toast('❌ Insufficient funds — get testnet ETH from the faucet', true);
+    else toast('❌ ' + (e.message || 'Unknown error'), true);
   }
 }
 async function waitReceipt(h,n=30){
