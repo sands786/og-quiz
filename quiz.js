@@ -1,21 +1,21 @@
 /* ═══════════════════════════════════════════════════════════
    OG QUIZ — quiz.js
-   OpenGradient Testnet: Chain ID 10744
+   OpenGradient Testnet: Chain ID 10744 (0x29f8)
    RPC: https://eth-devnet.opengradient.ai
+   Created by: Master Shifu | @husnain50376345 | alpha_53645
 ════════════════════════════════════════════════════════════ */
 
 // ── NETWORK CONFIG ──────────────────────────────────────────
 const OG_NETWORK = {
-  chainId:     '0x29F8',           // 10744 in hex
-  chainName:   'OpenGradient Testnet',
-  rpcUrls:     ['https://eth-devnet.opengradient.ai'],
+  chainId: '0x29f8',                          // 10744 — lowercase to match MetaMask
+  chainName: 'OpenGradient Testnet',
+  rpcUrls: ['https://eth-devnet.opengradient.ai'],
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   blockExplorerUrls: ['https://explorer.opengradient.ai'],
 };
 
-// Entry fee: 0.1 ETH in wei (hex)
-const ENTRY_FEE_WEI = '0x16345785D8A0000'; // 0.1 ETH
-// Treasury address — replace with your own wallet to receive fees
+const ENTRY_FEE_WEI = '0x16345785D8A0000'; // 0.1 ETH in wei
+// ⚠️ Replace with YOUR wallet to receive entry fees
 const TREASURY = '0x0000000000000000000000000000000000000001';
 
 // ── STATE ───────────────────────────────────────────────────
@@ -23,65 +23,77 @@ let walletAddress = '';
 let txHash = '';
 let currentQ = 0, score = 0, answers = [];
 let timerInterval = null, timeLeft = 30;
-let demoMode = false;
 
 // ── WALLET CONNECT ──────────────────────────────────────────
 async function connectWallet() {
-  const btn = document.getElementById('connect-btn');
-  const statusEl = document.getElementById('wallet-status');
+  const btn    = document.getElementById('connect-btn');
+  const status = document.getElementById('wallet-status');
 
-  if (typeof window.ethereum === 'undefined') {
-    showStatus(statusEl, '❌ MetaMask not detected. Please install it from metamask.io', true);
+  if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
+    showStatus(status, '❌ MetaMask not found. <a href="https://metamask.io/download/" target="_blank" style="color:#00D4FF">Install here →</a>', true);
     return;
   }
 
+  // Check if already connected — no popup needed
+  try {
+    const existing = await window.ethereum.request({ method: 'eth_accounts' });
+    if (existing && existing.length > 0) {
+      walletAddress = existing[0];
+      onWalletConnected(btn, status);
+      return;
+    }
+  } catch (_) {}
+
+  // Request connection
   btn.disabled = true;
-  btn.textContent = '⏳ Connecting...';
+  btn.textContent = '⏳ Check MetaMask popup...';
+  showStatus(status, '👆 Approve the MetaMask popup to continue', false);
 
   try {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     walletAddress = accounts[0];
-    const short = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
-    showStatus(statusEl, `✓ Connected: ${short}`, false);
-    btn.textContent = `✓ ${short}`;
-    btn.style.background = 'linear-gradient(135deg,#00FF9D,#00D4FF)';
-    btn.style.color = '#050508';
-
-    // Show next step
-    document.getElementById('step-network').classList.remove('hidden');
-    showToast('Wallet connected! Now switch to OG Testnet.');
-
-    // Listen for account changes
-    window.ethereum.on('accountsChanged', (accs) => {
-      if (accs.length === 0) location.reload();
-      else { walletAddress = accs[0]; }
-    });
-
+    onWalletConnected(btn, status);
   } catch (err) {
     btn.disabled = false;
     btn.textContent = 'Connect MetaMask';
-    if (err.code === 4001) showStatus(statusEl, '❌ Connection rejected by user', true);
-    else showStatus(statusEl, `❌ Error: ${err.message}`, true);
+    if (err.code === 4001)
+      showStatus(status, '❌ Connection rejected. Try again.', true);
+    else if (err.code === -32002)
+      showStatus(status, '⚠️ MetaMask already has a pending request — click the MetaMask icon in your browser toolbar and approve it.', true);
+    else
+      showStatus(status, '❌ ' + (err.message || 'Unknown error'), true);
   }
 }
 
-// ── SWITCH NETWORK ───────────────────────────────────────────
+function onWalletConnected(btn, status) {
+  const short = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+  showStatus(status, '✓ Connected: ' + short, false);
+  btn.textContent = '✓ ' + short;
+  btn.style.background = 'linear-gradient(135deg,#00FF9D,#00D4FF)';
+  btn.style.color = '#050508';
+  btn.disabled = false;
+  document.getElementById('step-network').classList.remove('hidden');
+  showToast('✓ Wallet connected! Switch to OG Testnet next.');
+  window.ethereum.on('accountsChanged', (accs) => {
+    if (!accs.length) location.reload();
+    else walletAddress = accs[0];
+  });
+}
+
+// ── SWITCH NETWORK ──────────────────────────────────────────
 async function switchNetwork() {
   const btn = document.getElementById('network-btn');
   btn.disabled = true;
-  btn.textContent = '⏳ Switching network...';
+  btn.textContent = '⏳ Switching...';
 
   try {
-    // Try switching first (works if already added)
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: OG_NETWORK.chainId }],
     });
     onNetworkSwitched();
-
   } catch (err) {
     if (err.code === 4902 || err.code === -32603) {
-      // Chain not added yet — add it
       try {
         await window.ethereum.request({
           method: 'wallet_addEthereumChain',
@@ -100,7 +112,7 @@ async function switchNetwork() {
     } else {
       btn.disabled = false;
       btn.textContent = '🔗 Switch to OpenGradient Testnet';
-      showToast('❌ ' + err.message, true);
+      showToast('❌ ' + (err.message || 'Unknown error'), true);
     }
   }
 }
@@ -115,56 +127,57 @@ function onNetworkSwitched() {
   showToast('✓ Switched to OpenGradient Testnet!');
 }
 
-// ── PAY & START ──────────────────────────────────────────────
+// ── PAY & START ─────────────────────────────────────────────
 async function payAndStart() {
   const btn = document.getElementById('pay-btn');
   btn.disabled = true;
   btn.textContent = '⏳ Confirm in MetaMask...';
 
   try {
-    // Verify correct network
+    // Case-insensitive chain ID check — MetaMask returns lowercase
     const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    if (chainId !== OG_NETWORK.chainId) {
+    if (chainId.toLowerCase() !== OG_NETWORK.chainId.toLowerCase()) {
       showToast('❌ Please switch to OpenGradient Testnet first', true);
       btn.disabled = false;
       btn.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
       return;
     }
 
-    // Send transaction
+    // Clean native ETH transfer — no data field, no contract call
     const hash = await window.ethereum.request({
       method: 'eth_sendTransaction',
       params: [{
-        from: walletAddress,
-        to:   TREASURY,
+        from:  walletAddress,
+        to:    TREASURY,
         value: ENTRY_FEE_WEI,
-        gas:  '0x5208', // 21000
-        data: '0x4f47517569z', // "OGQuiz" marker in hex (optional memo)
+        gas:   '0x5208',   // 21000 — standard ETH transfer, cheapest possible
       }],
     });
 
     txHash = hash;
-    btn.textContent = '⏳ Waiting for confirmation...';
-    showToast('Transaction sent! Waiting...');
-
-    // Poll for receipt
+    btn.textContent = '⏳ Confirming on-chain...';
+    showToast('✅ Transaction sent! Confirming...');
     await waitForReceipt(hash);
 
     btn.textContent = '✓ Paid! Loading quiz...';
     btn.style.background = 'linear-gradient(135deg,#00FF9D,#00D4FF)';
     btn.style.color = '#050508';
-    showToast('✓ 0.1 ETH paid! Quiz unlocked 🎉');
+    showToast('🎉 Entry fee paid! Quiz unlocked!');
     setTimeout(() => startQuiz(), 1200);
 
   } catch (err) {
     btn.disabled = false;
     btn.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
-    if (err.code === 4001) showToast('❌ Transaction rejected by user', true);
-    else showToast('❌ Tx failed: ' + (err.message || 'Unknown error'), true);
+    if (err.code === 4001)
+      showToast('❌ Transaction rejected', true);
+    else if (err.code === -32603)
+      showToast('❌ Insufficient funds — get testnet ETH from faucet.opengradient.ai', true);
+    else
+      showToast('❌ ' + (err.message || 'Unknown error'), true);
   }
 }
 
-async function waitForReceipt(hash, retries = 30) {
+async function waitForReceipt(hash, retries = 40) {
   for (let i = 0; i < retries; i++) {
     try {
       const receipt = await window.ethereum.request({
@@ -172,25 +185,23 @@ async function waitForReceipt(hash, retries = 30) {
         params: [hash],
       });
       if (receipt && receipt.status === '0x1') return receipt;
-      if (receipt && receipt.status === '0x0') throw new Error('Transaction reverted');
+      if (receipt && receipt.status === '0x0') throw new Error('Transaction reverted on-chain');
     } catch (e) {
-      if (e.message === 'Transaction reverted') throw e;
+      if (e.message === 'Transaction reverted on-chain') throw e;
     }
     await new Promise(r => setTimeout(r, 2000));
   }
-  // Timeout — proceed anyway (testnet can be slow)
-  return null;
+  return null; // Timeout — proceed anyway (testnet can be slow)
 }
 
 // ── DEMO MODE ────────────────────────────────────────────────
 function startDemo() {
-  demoMode = true;
   walletAddress = '0xDEMO';
   showToast('Demo mode — no payment needed!');
   setTimeout(() => startQuiz(), 400);
 }
 
-// ── QUIZ ─────────────────────────────────────────────────────
+// ── QUIZ ENGINE ─────────────────────────────────────────────
 function startQuiz() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('quiz-container').classList.remove('hidden');
@@ -200,9 +211,9 @@ function startQuiz() {
 
 function renderQuestion() {
   const q = QUESTIONS[currentQ];
-  document.getElementById('q-label').textContent = `Question ${currentQ + 1} / ${QUESTIONS.length}`;
+  document.getElementById('q-label').textContent     = `Question ${currentQ + 1} / ${QUESTIONS.length}`;
   document.getElementById('q-cat-label').textContent = q.category;
-  document.getElementById('score-live').textContent = score;
+  document.getElementById('score-live').textContent  = score;
   document.getElementById('progress-fill').style.width = `${(currentQ / QUESTIONS.length) * 100}%`;
   startTimer();
 
@@ -214,7 +225,7 @@ function renderQuestion() {
       <div class="options" id="options">
         ${q.opts.map((o, i) => `
           <button class="option" id="opt-${i}" onclick="selectOption(${i})">
-            <span class="option-letter">${String.fromCharCode(65+i)}</span>${o}
+            <span class="option-letter">${String.fromCharCode(65 + i)}</span>${o}
           </button>`).join('')}
       </div>
       <div class="q-feedback" id="feedback"></div>
@@ -264,7 +275,7 @@ function selectOption(idx) {
   const fb = document.getElementById('feedback');
   fb.innerHTML = isCorrect
     ? `✅ Correct! ${q.explain}`
-    : `❌ The correct answer is <strong>${q.opts[q.ans]}</strong>. ${q.explain}`;
+    : `❌ Correct answer: <strong>${q.opts[q.ans]}</strong>. ${q.explain}`;
   fb.className = `q-feedback ${isCorrect ? 'correct-fb' : 'wrong-fb'} show`;
   document.getElementById('next-btn').classList.add('show');
 }
@@ -279,51 +290,50 @@ function nextQuestion() {
   else renderQuestion();
 }
 
-// ── RESULTS ──────────────────────────────────────────────────
+// ── RESULTS ─────────────────────────────────────────────────
 function getRank(s) {
-  if (s >= 23) return { emoji:'🏆', name:'OG Legend',      color:'#FFE600', msg:"Absolute OpenGradient expert! You understand every layer — HACA, TEE, investors, SDK. The OG ecosystem needs minds like yours." };
-  if (s >= 20) return { emoji:'💎', name:'Master Node',     color:'#00D4FF', msg:"Outstanding! Deep knowledge of OG's tech, mission and ecosystem. You're ready to build serious dApps and agents on the network." };
-  if (s >= 17) return { emoji:'🔮', name:'TEE Validator',   color:'#B829F7', msg:"Excellent work! Strong knowledge of TEE architecture, funding, and tools. A few more deep dives and you'll be a Legend." };
-  if (s >= 13) return { emoji:'⛓️', name:'On-Chain Dev',    color:'#00FF9D', msg:"Good showing! Solid OG knowledge. Revisit the architecture docs and SDK reference to level up further." };
-  if (s >= 9)  return { emoji:'🌐', name:'Inference Node',  color:'#FF6B00', msg:"Decent start! Familiar with some OG concepts. Read the official docs, especially HACA architecture and developer guides." };
-  if (s >= 5)  return { emoji:'📡', name:'Testnet User',    color:'#6b6b80', msg:"Getting started! Head to docs.opengradient.ai and study the materials before challenging yourself again." };
-  return       { emoji:'🌱', name:'Genesis Node',           color:'#6b6b80', msg:"Every expert starts somewhere! Read through the docs and try again. You've got this!" };
+  if (s >= 23) return { emoji: '🏆', name: 'OG Legend',     color: '#FFE600', msg: "Absolute OpenGradient expert. Every layer — HACA, TEE, ZKML, SDK, agents — fully mastered. The OG ecosystem needs minds like yours." };
+  if (s >= 20) return { emoji: '💎', name: 'Master Node',    color: '#00D4FF', msg: "Outstanding! Deep knowledge of OG's tech and ecosystem. You're ready to build serious dApps and agents on the network." };
+  if (s >= 17) return { emoji: '🔮', name: 'TEE Validator',  color: '#B829F7', msg: "Excellent! Strong knowledge of TEE architecture and tools. A few more deep dives and you'll reach Legend status." };
+  if (s >= 13) return { emoji: '⛓️', name: 'On-Chain Dev',   color: '#00FF9D', msg: "Good showing! Solid OG knowledge. Revisit the architecture docs and SDK reference to level up." };
+  if (s >= 9)  return { emoji: '🌐', name: 'Inference Node', color: '#FF6B00', msg: "Decent start! Read the official docs, especially HACA architecture and developer guides." };
+  if (s >= 5)  return { emoji: '📡', name: 'Testnet User',   color: '#6b6b80', msg: "Getting started! Head to docs.opengradient.ai and study before challenging yourself again." };
+  return        { emoji: '🌱', name: 'Genesis Node',          color: '#6b6b80', msg: "Every expert starts somewhere! Read through the docs and try again. You've got this!" };
 }
 
 function showResults() {
   clearInterval(timerInterval);
   document.getElementById('quiz-container').classList.add('hidden');
-  const resultsEl = document.getElementById('results');
-  resultsEl.classList.remove('hidden');
+  document.getElementById('results').classList.remove('hidden');
 
-  const rank = getRank(score);
-  const pct  = Math.round((score / QUESTIONS.length) * 100);
+  const rank    = getRank(score);
+  const pct     = Math.round((score / QUESTIONS.length) * 100);
   const correct = answers.filter(a => a.correct).length;
   const wrong   = answers.filter(a => !a.correct && a.selected !== -1).length;
   const missed  = answers.filter(a => a.selected === -1).length;
   const short   = walletAddress !== '0xDEMO' ? walletAddress.slice(0,6)+'...'+walletAddress.slice(-4) : 'Demo Mode';
-  const explorerLink = txHash ? `<a href="https://explorer.opengradient.ai/tx/${txHash}" target="_blank">${txHash.slice(0,16)}...</a>` : null;
+  const txLink  = txHash
+    ? `<div class="tx-receipt"><span class="tx-receipt-dot"></span>
+       <div class="tx-receipt-text">✓ On-chain tx:
+         <a href="https://explorer.opengradient.ai/tx/${txHash}" target="_blank">${txHash.slice(0,18)}...</a>
+       </div></div>` : '';
 
   document.getElementById('result-card').innerHTML = `
     <span class="result-emoji">${rank.emoji}</span>
     <div class="result-rank" style="color:${rank.color};">${rank.name}</div>
     <div class="result-score">${score} / ${QUESTIONS.length}</div>
-    <div class="result-sub">${pct}% accuracy · Wallet: ${short}</div>
-    ${explorerLink ? `
-    <div class="tx-receipt">
-      <span class="tx-receipt-dot"></span>
-      <div class="tx-receipt-text">✓ On-chain tx: ${explorerLink}</div>
-    </div>` : ''}
+    <div class="result-sub">${pct}% accuracy · ${short}</div>
+    ${txLink}
     <div class="result-stats">
-      <div class="result-stat"><div class="result-stat-val" style="color:var(--green);">${correct}</div><div class="result-stat-lbl">Correct</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:#00FF9D;">${correct}</div><div class="result-stat-lbl">Correct</div></div>
       <div class="result-stat"><div class="result-stat-val" style="color:#fc6c6c;">${wrong}</div><div class="result-stat-lbl">Wrong</div></div>
-      <div class="result-stat"><div class="result-stat-val" style="color:var(--yellow);">${missed}</div><div class="result-stat-lbl">Timed Out</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:#FFE600;">${missed}</div><div class="result-stat-lbl">Timed Out</div></div>
     </div>
     <div class="result-message">${rank.msg}</div>
     <div class="result-btns">
       <button class="result-btn primary" onclick="retryQuiz()">🔄 Retry Quiz</button>
       <a href="https://docs.opengradient.ai/" target="_blank" style="text-decoration:none;"><button class="result-btn secondary">📚 Study the Docs</button></a>
-      <a href="https://github.com/OpenGradient/testnet-faucet" target="_blank" style="text-decoration:none;"><button class="result-btn secondary">🚰 Get Testnet ETH (Faucet)</button></a>
+      <a href="https://faucet.opengradient.ai/" target="_blank" style="text-decoration:none;"><button class="result-btn secondary">🚰 Get Testnet ETH</button></a>
       <a href="https://explorer.opengradient.ai" target="_blank" style="text-decoration:none;"><button class="result-btn secondary">🔍 OG Block Explorer</button></a>
     </div>`;
 
@@ -333,16 +343,16 @@ function showResults() {
 function retryQuiz() {
   document.getElementById('results').classList.add('hidden');
   document.getElementById('landing').style.display = 'block';
-  const payBtn = document.getElementById('pay-btn');
-  payBtn.disabled = false;
-  payBtn.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
-  payBtn.style.background = '';
-  payBtn.style.color = '';
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = false;
+  btn.textContent = '💸 Pay 0.1 ETH & Start Quiz →';
+  btn.style.background = '';
+  btn.style.color = '';
 }
 
-// ── HELPERS ──────────────────────────────────────────────────
-function showStatus(el, msg, isError) {
-  el.textContent = msg;
+// ── HELPERS ─────────────────────────────────────────────────
+function showStatus(el, html, isError) {
+  el.innerHTML = html;
   el.className = 'wallet-status' + (isError ? ' error' : '');
   el.classList.remove('hidden');
 }
@@ -351,184 +361,384 @@ function showToast(msg, isError = false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast' + (isError ? ' error-toast' : '') + ' show';
-  setTimeout(() => t.classList.remove('show'), 3200);
+  setTimeout(() => t.classList.remove('show'), 3500);
 }
 
 function spawnConfetti() {
   const colors = ['#00D4FF','#FF00A0','#B829F7','#00FF9D','#FFE600','#FF6B00'];
-  const wrap = document.getElementById('confetti');
-  for (let i = 0; i < 80; i++) {
+  const wrap   = document.getElementById('confetti');
+  for (let i = 0; i < 90; i++) {
     const c = document.createElement('div');
     c.className = 'conf';
-    c.style.left = Math.random() * 100 + 'vw';
-    c.style.background = colors[Math.floor(Math.random() * colors.length)];
-    c.style.width  = (Math.random() * 8 + 4) + 'px';
-    c.style.height = (Math.random() * 8 + 4) + 'px';
+    c.style.left              = Math.random() * 100 + 'vw';
+    c.style.background        = colors[Math.floor(Math.random() * colors.length)];
+    c.style.width             = (Math.random() * 8 + 4) + 'px';
+    c.style.height            = (Math.random() * 8 + 4) + 'px';
     c.style.animationDuration = (Math.random() * 2 + 2) + 's';
-    c.style.animationDelay   = Math.random() * 1.5 + 's';
-    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    c.style.animationDelay    = Math.random() * 1.5 + 's';
+    c.style.borderRadius      = Math.random() > 0.5 ? '50%' : '2px';
     wrap.appendChild(c);
     setTimeout(() => c.remove(), 5000);
   }
 }
 
-// ── BG CANVAS ─────────────────────────────────────────────────
-(function() {
+// ── BG CANVAS ───────────────────────────────────────────────
+(function () {
   const canvas = document.getElementById('bg');
-  const ctx = canvas.getContext('2d');
+  const ctx    = canvas.getContext('2d');
   let particles = [];
+
   function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+
   function init() {
-    const cols = ['#00D4FF','#FF00A0','#B829F7','#00FF9D'];
-    particles = Array.from({length:18}, () => ({
-      x:Math.random()*canvas.width, y:Math.random()*canvas.height,
-      vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
-      size:Math.random()*2+1, color:cols[Math.floor(Math.random()*cols.length)], alpha:Math.random()*.35+.15
+    const cols = ['#00D4FF', '#FF00A0', '#B829F7', '#00FF9D'];
+    particles = Array.from({ length: 20 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - .5) * .4,
+      vy: (Math.random() - .5) * .4,
+      size: Math.random() * 2 + 1,
+      color: cols[Math.floor(Math.random() * cols.length)],
+      alpha: Math.random() * .35 + .15,
     }));
   }
+
   function frame() {
-    ctx.fillStyle = 'rgba(5,5,8,0.12)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = 'rgba(5,5,8,0.12)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => {
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
-      if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-      ctx.fillStyle=p.color; ctx.globalAlpha=p.alpha; ctx.fill(); ctx.globalAlpha=1;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
     });
-    particles.forEach((p1,i) => particles.slice(i+1).forEach(p2 => {
-      const dx=p1.x-p2.x, dy=p1.y-p2.y, d=Math.sqrt(dx*dx+dy*dy);
-      if(d<140){ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.strokeStyle='#00D4FF';ctx.globalAlpha=(1-d/140)*.06;ctx.stroke();ctx.globalAlpha=1;}
+    particles.forEach((p1, i) => particles.slice(i + 1).forEach(p2 => {
+      const dx = p1.x - p2.x, dy = p1.y - p2.y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < 140) {
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = '#00D4FF';
+        ctx.globalAlpha = (1 - d / 140) * .06;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
     }));
     requestAnimationFrame(frame);
   }
+
   window.addEventListener('resize', () => { resize(); init(); });
   resize(); init(); frame();
 })();
 
-// ── QUESTIONS (25) ────────────────────────────────────────────
+// ── QUESTIONS (25) — Deep Technical Knowledge ───────────────
 const QUESTIONS = [
-  { category:"Basics", color:"rgba(0,212,255,.15)", textColor:"#00D4FF",
-    q:"What is OpenGradient's primary mission?",
-    opts:["Build centralized AI cloud services","Create the first decentralized, verifiable AI infrastructure on-chain","Develop a new programming language for AI","Compete with OpenAI's GPT models"],
-    ans:1, explain:"OpenGradient's mission is to democratize AI by building the first permissionless, decentralized platform for AI model hosting, secure inference, agent execution, and dApp deployment — all fully verifiable on-chain." },
-
-  { category:"Funding", color:"rgba(255,230,0,.12)", textColor:"#FFE600",
-    q:"How much did OpenGradient raise in its seed round in October 2024?",
-    opts:["$2.5 million","$5 million","$8.5 million","$15 million"],
-    ans:2, explain:"OpenGradient raised $8.5M in a seed round led by a16z CSX with participation from Coinbase Ventures, SV Angel, Foresight Ventures, and notable angel investors." },
-
-  { category:"Investors", color:"rgba(184,41,247,.15)", textColor:"#B829F7",
-    q:"Which accelerator selected OpenGradient for its Fall 2024 cohort?",
-    opts:["Y Combinator","a16z CSX (Crypto Startup Accelerator)","Binance Labs","Draper Associates"],
-    ans:1, explain:"OpenGradient was selected for the a16z Crypto Startup Accelerator (CSX) Fall 2024 program in NYC. a16z CSX invests at least $500K in each selected company." },
-
-  { category:"Technology", color:"rgba(0,255,157,.12)", textColor:"#00FF9D",
-    q:"What does HACA stand for in OpenGradient's architecture?",
-    opts:["High-Accuracy Chain Architecture","Heterogeneous AI Compute Architecture","Hybrid Autonomous Computing Array","Hierarchical AI Contract Architecture"],
-    ans:1, explain:"HACA stands for Heterogeneous AI Compute Architecture. It's OpenGradient's multi-layer system that routes AI inference to the right hardware based on security and speed." },
-
-  { category:"Technology", color:"rgba(0,255,157,.12)", textColor:"#00FF9D",
-    q:"What technology provides cryptographic proof that AI inference ran inside a secure, unmodified enclave?",
-    opts:["Zero-Knowledge Proofs only","Trusted Execution Environments (TEE)","Homomorphic Encryption","Multi-Party Computation"],
-    ans:1, explain:"Trusted Execution Environments (TEE) are hardware-isolated secure enclaves that cryptographically sign every AI output, proving the model ran unmodified and untampered." },
-
-  { category:"Blockchain", color:"rgba(255,0,160,.12)", textColor:"#FF00A0",
-    q:"What is the Chain ID of OpenGradient's testnet?",
-    opts:["1337","8453","10744","42161"],
-    ans:2, explain:"OpenGradient Testnet has Chain ID 10744 (0x29F8 in hex). The RPC URL is https://eth-devnet.opengradient.ai and the native currency symbol is ETH." },
-
-  { category:"Blockchain", color:"rgba(255,0,160,.12)", textColor:"#FF00A0",
-    q:"What type of blockchain does OpenGradient use?",
-    opts:["Solana-compatible","Bitcoin Layer 2","EVM-compatible (Ethereum Virtual Machine)","Cosmos-based"],
-    ans:2, explain:"OpenGradient runs on an EVM-compatible blockchain, meaning developers can call AI models directly from Solidity smart contracts with no special tooling." },
-
-  { category:"Investors", color:"rgba(184,41,247,.15)", textColor:"#B829F7",
-    q:"Which co-inventor of the Transformer architecture is an angel investor in OpenGradient?",
-    opts:["Yann LeCun","Geoffrey Hinton","Illia Polosukhin (NEAR founder)","Andrew Ng"],
-    ans:2, explain:"Illia Polosukhin, co-founder of NEAR Protocol, co-invented the Transformer architecture powering all modern LLMs — and is an angel investor in OpenGradient." },
-
-  { category:"Investors", color:"rgba(184,41,247,.15)", textColor:"#B829F7",
-    q:"Balaji Srinivasan, an angel investor in OpenGradient, was previously best known as:",
-    opts:["CTO of Google","CTO of Coinbase","CEO of Ripple","Founder of Ethereum"],
-    ans:1, explain:"Balaji Srinivasan is the former CTO of Coinbase and author of 'The Network State'. He is one of OpenGradient's high-profile angel investors." },
-
-  { category:"Products", color:"rgba(255,107,0,.12)", textColor:"#FF6B00",
-    q:"What is MemSync in OpenGradient's ecosystem?",
-    opts:["A blockchain wallet","A long-term memory layer for AI with persistent context management","A DEX for $OPG tokens","A GPU rental marketplace"],
-    ans:1, explain:"MemSync is OpenGradient's long-term memory layer for AI. It provides a REST API for persistent context, fact extraction, semantic search — with cryptographic proof of authenticity." },
-
-  { category:"Products", color:"rgba(255,107,0,.12)", textColor:"#FF6B00",
-    q:"What is BitQuant in the OpenGradient ecosystem?",
-    opts:["A Bitcoin trading bot","An open-source AI agent framework for quantitative trading using on-chain ML models","A stablecoin pegged to BTC","A block explorer"],
-    ans:1, explain:"BitQuant is OpenGradient's open-source AI agent framework for quant trading. It uses on-chain ML models for market analytics, portfolio management, and autonomous trade execution." },
-
-  { category:"Technology", color:"rgba(0,255,157,.12)", textColor:"#00FF9D",
-    q:"In OpenGradient's HACA, what do 'Inference Nodes' primarily do?",
-    opts:["Verify transaction signatures","Store blockchain state","Run AI model inference with specialized GPU hardware","Distribute token rewards"],
-    ans:2, explain:"Inference nodes are specialized for running AI models on GPU hardware. This separation of inference from verification is a core HACA design principle." },
-
-  { category:"Technology", color:"rgba(0,255,157,.12)", textColor:"#00FF9D",
-    q:"Which verification methods does OpenGradient's HACA support?",
-    opts:["Only TEE-based","Only Zero-Knowledge Proofs","A spectrum: TEE attestations, ZKML, and cryptoeconomic security","Only on-chain re-execution"],
-    ans:2, explain:"HACA supports a full spectrum: TEE attestations, ZKML for mathematical certainty, and cryptoeconomic security. You can even mix methods within a single transaction." },
-
-  { category:"Developers", color:"rgba(0,212,255,.15)", textColor:"#00D4FF",
-    q:"What programming language is the OpenGradient SDK currently available in?",
-    opts:["JavaScript only","Rust","Python (TypeScript in development)","Go"],
-    ans:2, explain:"The OpenGradient SDK is available for Python with a TypeScript version in development. It includes a Python library and a CLI tool called 'opengradient'." },
-
-  { category:"Developers", color:"rgba(0,212,255,.15)", textColor:"#00D4FF",
-    q:"What is AlphaSense in OpenGradient's developer stack?",
-    opts:["A financial data API","A tool that wraps verifiable AI workflows to give AI agents powerful on-chain signals","A hardware monitoring dashboard","A smart contract auditing tool"],
-    ans:1, explain:"AlphaSense wraps verifiable AI workflows and exposes them as tools for AI agents — giving your agent 'superpowers' with on-chain verified signals." },
-
-  { category:"Basics", color:"rgba(0,212,255,.15)", textColor:"#00D4FF",
-    q:"What core problem does OpenGradient solve that centralized AI providers cannot?",
-    opts:["Faster response times","Complete cryptographic verifiability of every AI inference — proof outputs weren't tampered with","Lower API pricing","Better model quality"],
-    ans:1, explain:"The core problem is trust. With centralized AI you can't verify outputs. OpenGradient provides cryptographic proof of every single inference — something no centralized provider offers." },
-
-  { category:"Blockchain", color:"rgba(255,0,160,.12)", textColor:"#FF00A0",
-    q:"What is the RPC URL for OpenGradient's developer testnet?",
-    opts:["https://rpc.opengradient.ai","https://eth-devnet.opengradient.ai","https://testnet.opengradient.io","https://api.og-chain.net"],
-    ans:1, explain:"The OpenGradient testnet RPC URL is https://eth-devnet.opengradient.ai — used when adding OG to MetaMask or initializing the Python SDK." },
-
-  { category:"Products", color:"rgba(255,107,0,.12)", textColor:"#FF6B00",
-    q:"What is the OpenGradient Model Hub?",
-    opts:["A GPU marketplace","A community model registry to discover, deploy, and monetize open-source AI models on-chain","An NFT collection","A smart contract audit service"],
-    ans:1, explain:"The Model Hub is OG's decentralized model repository. Think Hugging Face — but on-chain, permissionless, and with ownership attribution." },
-
-  { category:"Investors", color:"rgba(184,41,247,.15)", textColor:"#B829F7",
-    q:"Sandeep Nailwal, an angel investor in OpenGradient, co-founded which blockchain project?",
-    opts:["Solana","Avalanche","Polygon","Arbitrum"],
-    ans:2, explain:"Sandeep Nailwal is co-founder of Polygon, one of Ethereum's largest L2 ecosystems. He invested in OpenGradient's seed round." },
-
-  { category:"Technology", color:"rgba(0,255,157,.12)", textColor:"#00FF9D",
-    q:"Why does OpenGradient NOT ask every validator to re-run AI inferences?",
-    opts:["To save storage","AI inference is computationally expensive, requires GPUs, and is non-deterministic — making full re-execution impractical","Copyright concerns","Would slow token transfers"],
-    ans:1, explain:"Unlike simple transactions, AI inference costs orders of magnitude more, needs specialized GPUs, and is non-deterministic. Dedicated inference nodes run models and full nodes verify proofs instead." },
-
-  { category:"Developers", color:"rgba(0,212,255,.15)", textColor:"#00D4FF",
-    q:"What is x402 in OpenGradient's ecosystem?",
-    opts:["An internal error code","A payments protocol for the internet built on HTTP enabling verifiable LLM inference with payment flows","A transaction type","A smart contract name"],
-    ans:1, explain:"x402 is an HTTP-based payments protocol (originally from Coinbase) that OpenGradient uses as a gateway for verifiable LLM inference with payment flows built in." },
-
-  { category:"Products", color:"rgba(255,107,0,.12)", textColor:"#FF6B00",
-    q:"What is Neuro Stack in OpenGradient?",
-    opts:["A GPU hardware stack","Technology to spin up your own sovereign AI-enabled blockchain for agents or apps","A frontend UI kit","A staking mechanism"],
-    ans:1, explain:"Neuro Stack lets anyone deploy their own sovereign AI-enabled blockchain — ideal for building specialized chains for AI agents or AI-powered applications." },
-
-  { category:"Basics", color:"rgba(0,212,255,.15)", textColor:"#00D4FF",
-    q:"What was OpenGradient's previous company name before rebranding?",
-    opts:["DeepChain Labs","Vanna Laboratories","Gradient Protocol","ChainML Inc"],
-    ans:1, explain:"OpenGradient was formerly known as Vanna Laboratories before rebranding. It was founded in New York City in 2023." },
-
-  { category:"Developers", color:"rgba(0,212,255,.15)", textColor:"#00D4FF",
-    q:"The OpenGradient Agent Stack is compatible with which popular agent frameworks?",
-    opts:["Only OG's own framework","LangChain and OpenAI Swarm","TensorFlow and PyTorch","AutoGPT only"],
-    ans:1, explain:"The OG Agent Stack is compatible with LangChain and OpenAI Swarm, making it a plug-in replacement for centralized execution in existing agent setups." },
-
-  { category:"Blockchain", color:"rgba(255,0,160,.12)", textColor:"#FF00A0",
-    q:"Which on-chain use cases does OpenGradient explicitly enable through verifiable AI?",
-    opts:["Only chatbots","Risk management, AMM optimization, AI agents, Sybil resistance, DeFi mechanism design — all cryptographically proven","Only image generation","Only text summarization"],
-    ans:1, explain:"OpenGradient enables high-stakes use cases: risk management, ML optimization, AI agents, Sybil resistance, DeFi, AMM optimization — all with cryptographic verifiability built-in." },
+  {
+    category: "Architecture", color: "rgba(0,212,255,.15)", textColor: "#00D4FF",
+    q: "In HACA, what fundamental problem does OpenGradient solve that prevents standard blockchains from running AI natively?",
+    opts: [
+      "Gas fees are too high for compute",
+      "AI inference is non-deterministic, GPU-dependent, and orders of magnitude more expensive — making full re-execution by all validators impossible",
+      "Smart contracts can't store large files",
+      "Blockchains don't support floating point math"
+    ],
+    ans: 1,
+    explain: "Standard blockchains assume every validator can cheaply re-execute any transaction. AI inference breaks all three assumptions: it's non-deterministic, requires specialized GPU hardware, and costs 10,000x more than a typical transaction. HACA solves this by separating inference from verification."
+  },
+  {
+    category: "Architecture", color: "rgba(0,212,255,.15)", textColor: "#00D4FF",
+    q: "HACA uses a 'verification spectrum'. What are the three trust tiers ordered from fastest to most mathematically certain?",
+    opts: [
+      "HTTP → IPFS → On-chain",
+      "Cryptoeconomic security → TEE attestations → ZKML proofs",
+      "Random sampling → Majority vote → Full re-execution",
+      "Optimistic → Pessimistic → Neutral"
+    ],
+    ans: 1,
+    explain: "HACA's three tiers: (1) Cryptoeconomic security — stake-based, fastest; (2) TEE attestations — hardware-isolated enclaves with cryptographic signatures; (3) ZKML proofs — zero-knowledge mathematical certainty, slowest but fully trustless. You can mix tiers within a single transaction."
+  },
+  {
+    category: "TEE", color: "rgba(0,255,157,.12)", textColor: "#00FF9D",
+    q: "When an OG inference node uses a TEE, what exactly does the attestation cryptographically prove to the verifier?",
+    opts: [
+      "That the node has enough GPU memory",
+      "That the exact model binary ran inside an unmodified, hardware-isolated enclave and produced the signed output — no tampering possible even by the node operator",
+      "That the transaction fee was paid",
+      "That the model weights are open source"
+    ],
+    ans: 1,
+    explain: "A TEE attestation is a hardware-signed certificate proving: (a) the specific model binary was loaded, (b) it ran inside a genuine Intel SGX or AMD SEV enclave, (c) the enclave was unmodified, and (d) the output was produced by that exact computation. Even the node operator cannot tamper with execution."
+  },
+  {
+    category: "TEE", color: "rgba(0,255,157,.12)", textColor: "#00FF9D",
+    q: "What is the key tradeoff between TEE verification and ZKML in OpenGradient's HACA?",
+    opts: [
+      "TEE is cheaper but slower",
+      "TEE relies on trusting hardware manufacturers (Intel/AMD), while ZKML is mathematically trustless but computationally much more expensive to generate",
+      "TEE only works for image models",
+      "ZKML requires MetaMask, TEE does not"
+    ],
+    ans: 1,
+    explain: "TEE's trust assumption is hardware-based — you trust Intel SGX or AMD SEV hasn't been compromised. ZKML requires zero trust — the proof is mathematically verifiable by anyone — but generating a ZK proof for a large neural network can take hours, making real-time inference impractical today."
+  },
+  {
+    category: "ZKML", color: "rgba(184,41,247,.15)", textColor: "#B829F7",
+    q: "Why is ZKML technically difficult to apply to large transformer models like GPT?",
+    opts: [
+      "Transformers use Python, ZK circuits use Rust",
+      "ZK proof generation scales poorly with model size — billions of parameters would take hours to prove, and attention mechanisms are hard to express as arithmetic circuits",
+      "ZK proofs can't handle floating point",
+      "OpenGradient doesn't support ZKML yet"
+    ],
+    ans: 1,
+    explain: "ZKML requires expressing every computation as an arithmetic circuit. Transformers involve billions of floating-point multiplications, softmax (requires division), and layer norm — all expensive in ZK. Current ZKML is practical for small CNNs but transformer-scale proofs remain an active research frontier."
+  },
+  {
+    category: "Developer SDK", color: "rgba(0,212,255,.15)", textColor: "#00D4FF",
+    q: "What does the OpenGradient Python SDK's run_inference() return beyond just the model output?",
+    opts: [
+      "Only the text response",
+      "The model output plus a cryptographic proof object (TEE attestation or ZK proof) that can be submitted on-chain to verify the inference happened correctly",
+      "A gas estimate",
+      "A JSON schema of the model"
+    ],
+    ans: 1,
+    explain: "run_inference() returns both the result AND a verifiable proof. The proof can be a SGX attestation quote, a ZKML proof, or a cryptoeconomic commitment depending on your selected verification tier. You can then pass this proof to a Solidity contract to trustlessly verify on-chain."
+  },
+  {
+    category: "Developer SDK", color: "rgba(0,212,255,.15)", textColor: "#00D4FF",
+    q: "What does og.contract.call_with_inference() enable that a standard Ethereum call cannot do?",
+    opts: [
+      "Call contracts on other chains",
+      "Execute a Solidity function whose inputs include live AI inference results — verified on-chain atomically in the same transaction",
+      "Pay gas in $OPG tokens",
+      "Deploy contracts without Solidity"
+    ],
+    ans: 1,
+    explain: "This is OG's killer feature. A single atomic transaction can: (1) run an AI model on an inference node, (2) get a verifiable proof, (3) pass the verified output directly as a parameter to a Solidity function. The smart contract trusts the AI output because the proof is verified on-chain in the same tx."
+  },
+  {
+    category: "Agents", color: "rgba(255,107,0,.12)", textColor: "#FF6B00",
+    q: "What makes OpenGradient's on-chain AI agents fundamentally different from off-chain agents like LangChain or AutoGPT?",
+    opts: [
+      "They are faster",
+      "Every reasoning step, tool call, and decision is cryptographically verifiable and recorded on-chain — creating a tamper-proof, auditable execution trail",
+      "They use a different programming language",
+      "They cost less to run"
+    ],
+    ans: 1,
+    explain: "Off-chain agents run on centralized servers — you trust the operator didn't tamper with behavior. OG agents run with TEE or ZK verification on every inference step. The entire execution — every prompt, every tool call, every decision — is verifiable on-chain. Critical for autonomous DeFi agents managing real funds."
+  },
+  {
+    category: "Agents", color: "rgba(255,107,0,.12)", textColor: "#FF6B00",
+    q: "AlphaSense in OpenGradient wraps AI workflows as agent tools. What does this enable for a DeFi trading agent?",
+    opts: [
+      "It enables the agent to buy NFTs",
+      "The agent can invoke verified on-chain ML models (price prediction, risk scoring, sentiment analysis) as trusted tool calls with cryptographically proven results — not black-box API responses",
+      "It gives the agent a UI",
+      "It converts Python to Solidity"
+    ],
+    ans: 1,
+    explain: "AlphaSense turns verifiable AI inference into composable agent tools. A DeFi agent using AlphaSense gets signed, on-chain-verifiable results — not responses from a black-box API. The DAO or fund manager can audit exactly which model produced which signal and verify it wasn't tampered with."
+  },
+  {
+    category: "MemSync", color: "rgba(255,107,0,.12)", textColor: "#FF6B00",
+    q: "What cryptographic property does MemSync add to AI agent memory that vector databases like Pinecone cannot provide?",
+    opts: [
+      "Faster retrieval",
+      "Every memory read/write is signed — you can cryptographically prove a specific fact was stored at a specific time and retrieved completely unmodified",
+      "It stores more data",
+      "It uses less RAM"
+    ],
+    ans: 1,
+    explain: "Pinecone and similar vector DBs are trusted third parties — you can't prove what they stored or returned. MemSync wraps memory operations with cryptographic proofs: you can prove to a smart contract that your agent's memory at time T contained fact X, and it was not modified between storage and retrieval."
+  },
+  {
+    category: "BitQuant", color: "rgba(255,107,0,.12)", textColor: "#FF6B00",
+    q: "BitQuant is OG's quant trading framework. What is its key advantage over traditional quant strategies running on AWS?",
+    opts: [
+      "Lower latency",
+      "Every trading signal is verifiable on-chain — LPs or DAO voters can audit that the bot followed the exact specified model and strategy, not a secretly modified one",
+      "It uses more data sources",
+      "It trades on more exchanges"
+    ],
+    ans: 1,
+    explain: "The biggest risk in quant funds is strategy drift — the operator secretly changes the model without telling LPs. BitQuant's verifiable inference means every signal comes with a cryptographic proof of which model produced it. LPs can verify the bot runs the agreed-upon strategy, not a substituted one."
+  },
+  {
+    category: "EVM Integration", color: "rgba(255,0,160,.12)", textColor: "#FF00A0",
+    q: "How does a Solidity smart contract on OpenGradient consume an AI inference result trustlessly?",
+    opts: [
+      "It calls an Oracle like Chainlink",
+      "It reads from a centralized API",
+      "The inference node submits the result + cryptographic proof on-chain. The OG verifier contract checks the proof and only if valid passes the result to your contract — all atomically",
+      "The developer hardcodes the result"
+    ],
+    ans: 2,
+    explain: "OG has an on-chain Verifier contract. Flow: (1) inference node runs model, (2) produces result + proof, (3) submits to Verifier, (4) Verifier checks proof (TEE or ZK), (5) verified output passed to your contract. No oracle, no trusted third party — all verified by the EVM itself."
+  },
+  {
+    category: "EVM Integration", color: "rgba(255,0,160,.12)", textColor: "#FF00A0",
+    q: "Why can't OpenGradient simply use Chainlink or Pyth oracles to bring AI results on-chain?",
+    opts: [
+      "Chainlink is too expensive",
+      "Oracles report external data via trusted committees — they don't execute arbitrary AI models and can't prove which model ran on which inputs. OG nodes run the model and generate the proof.",
+      "Chainlink doesn't support Solidity",
+      "OpenGradient has a partnership with Pyth"
+    ],
+    ans: 1,
+    explain: "Chainlink nodes are data reporters — they fetch external data and reach consensus on its value. They can't prove WHAT code ran or HOW a result was computed. OG's inference nodes run the actual model and generate a proof. Oracles say 'trust us'. OG says 'here's a mathematical proof that model M with inputs I produced output O'."
+  },
+  {
+    category: "Funding", color: "rgba(255,230,0,.12)", textColor: "#FFE600",
+    q: "Beyond the $8.5M seed raise, what strategic significance did a16z CSX selection give OpenGradient?",
+    opts: [
+      "Free office space only",
+      "Access to a16z's crypto portfolio network and a quality signal that attracted Coinbase Ventures, SV Angel, and high-profile angels like Illia Polosukhin and Balaji",
+      "A guaranteed token listing",
+      "Priority hiring at a16z companies"
+    ],
+    ans: 1,
+    explain: "a16z CSX is fiercely selective. Selection signals to the entire crypto VC ecosystem that a16z's AI+crypto thesis aligns with OG's approach. This directly facilitated co-investment from Coinbase Ventures and SV Angel, and gave credibility for Illia Polosukhin and Balaji to invest as angels."
+  },
+  {
+    category: "Investors", color: "rgba(184,41,247,.15)", textColor: "#B829F7",
+    q: "Illia Polosukhin co-authored 'Attention Is All You Need'. Why is his OG investment strategically significant?",
+    opts: [
+      "He provides cheap GPU access",
+      "As co-inventor of the architecture powering all modern LLMs (GPT, Claude, Gemini), his endorsement signals foundational AI credibility — and his NEAR experience in decentralized compute maps directly to OG's thesis",
+      "He is a famous YouTuber",
+      "He manages OpenGradient's Discord"
+    ],
+    ans: 1,
+    explain: "'Attention Is All You Need' (2017) invented the Transformer. Every major LLM runs on this architecture. Illia investing means the person who literally invented the foundation of modern AI believes decentralized, verifiable inference is the correct path forward. His NEAR background adds L1 infrastructure expertise."
+  },
+  {
+    category: "Investors", color: "rgba(184,41,247,.15)", textColor: "#B829F7",
+    q: "What structural parallel does Sandeep Nailwal (Polygon co-founder) investing in OG signal?",
+    opts: [
+      "Both use the same codebase",
+      "Polygon solved Ethereum's throughput limitation for transactions; OpenGradient solves Ethereum's inability to run verifiable AI compute — the same playbook one layer higher",
+      "Both are based in India",
+      "Polygon will merge with OpenGradient"
+    ],
+    ans: 1,
+    explain: "Polygon thesis: Ethereum L1 can't scale transactions → build L2. OG thesis: EVM can't run AI inference trustlessly → build a specialized AI compute layer on top. Sandeep's investment signals recognition of this structural parallel — the same architectural problem applied to AI compute."
+  },
+  {
+    category: "x402 Protocol", color: "rgba(0,212,255,.15)", textColor: "#00D4FF",
+    q: "The x402 protocol (originated at Coinbase) solves what specific problem for AI inference payments?",
+    opts: [
+      "It makes AI faster",
+      "It implements HTTP 402 (Payment Required) as a machine-native protocol — an AI agent can pay for inference automatically within the HTTP request itself, no human approval needed",
+      "It encrypts model weights",
+      "It reduces gas costs"
+    ],
+    ans: 1,
+    explain: "HTTP 402 was reserved in 1996 for 'Payment Required' but never implemented. x402 makes it real: any HTTP server can require a micro-payment before serving a response. For AI, autonomous agents pay for inference calls programmatically — no human approval, no subscription, no API key. Pure pay-per-inference, machine-to-machine."
+  },
+  {
+    category: "Neuro Stack", color: "rgba(184,41,247,.15)", textColor: "#B829F7",
+    q: "What is the architectural purpose of Neuro Stack vs deploying on OG's mainnet directly?",
+    opts: [
+      "It is cheaper",
+      "Neuro Stack lets you deploy a sovereign AI-enabled appchain with your own validator set, token economics, and governance — while inheriting OG's battle-tested AI inference primitives",
+      "It has better graphics",
+      "It only works with Python"
+    ],
+    ans: 1,
+    explain: "Think Neuro Stack like Cosmos SDK but for AI-first chains. Instead of sharing OG's validator set and block space, you get your own: token, governance, inference verification policy, fee structure. But you inherit OG's AI inference layer for free. Ideal for AI agent DAOs or vertical-specific AI networks."
+  },
+  {
+    category: "Model Hub", color: "rgba(0,255,157,.12)", textColor: "#00FF9D",
+    q: "What is the key economic difference between OG's Model Hub and Hugging Face?",
+    opts: [
+      "OG models are faster to download",
+      "On OG's Model Hub, every inference call is attribution-tracked and model creators earn fees automatically via smart contract — Hugging Face has no native payment or verifiable attribution layer",
+      "Hugging Face charges more",
+      "OG Model Hub only hosts small models"
+    ],
+    ans: 1,
+    explain: "Hugging Face is a hosting platform with no native payment rails. OG's Model Hub registers models as on-chain entities. Every time someone pays to run inference on your model, payment flows to your address automatically via smart contract. Model creators build sustainable revenue without intermediaries."
+  },
+  {
+    category: "Devnet", color: "rgba(255,0,160,.12)", textColor: "#FF00A0",
+    q: "When adding OpenGradient Testnet to MetaMask, which hex Chain ID must you enter — and why does capitalisation matter?",
+    opts: [
+      "0x1 — Ethereum Mainnet",
+      "0x29f8 (decimal 10744) — MetaMask returns lowercase hex so comparisons must be case-insensitive or lowercase",
+      "0xA — Polygon",
+      "0x38 — BSC"
+    ],
+    ans: 1,
+    explain: "OG Testnet Chain ID is 10744 = 0x29f8 hex. MetaMask always returns chain IDs in lowercase. If your code compares against '0x29F8' using strict equality it will fail even when you're on the right network. Always use .toLowerCase() on both sides of the comparison."
+  },
+  {
+    category: "Architecture", color: "rgba(0,212,255,.15)", textColor: "#00D4FF",
+    q: "What does 'heterogeneous' mean in HACA — what exactly is heterogeneous?",
+    opts: [
+      "The team members are from different countries",
+      "The compute resources — HACA routes to different hardware (CPU nodes, GPU clusters, TEE enclaves) AND different verification methods (cryptoeconomic, TEE, ZKML) based on each job's requirements",
+      "The smart contracts use different languages",
+      "The validators have different token stakes"
+    ],
+    ans: 1,
+    explain: "HACA has: lightweight CPU nodes (fast, cheap, simple models), GPU clusters (LLMs), TEE-enabled nodes (privacy + attestation), and ZKML prover nodes (mathematically certain, slow). The scheduler routes each inference to the optimal combination based on cost, latency, and verification requirements specified by the dApp."
+  },
+  {
+    category: "Agents", color: "rgba(255,107,0,.12)", textColor: "#FF6B00",
+    q: "What does 'composable verified inference' mean in practice for a DeFi protocol using OG?",
+    opts: [
+      "Agents can compose music",
+      "Multiple verified AI inference calls can be chained — risk model → portfolio optimizer → execution agent — where each step's output is cryptographically proven before the next step consumes it",
+      "Agents can compose NFTs",
+      "It means parallel execution only"
+    ],
+    ans: 1,
+    explain: "Example: Step 1 — market risk model (TEE-verified). Step 2 — feed verified risk output into a portfolio optimizer (ZKML-proven). Step 3 — pass verified allocation to an execution agent. Each step's proof is checked before the next runs. An auditable, trustless AI pipeline — impossible with existing oracle or off-chain agent tools."
+  },
+  {
+    category: "TEE", color: "rgba(0,255,157,.12)", textColor: "#00FF9D",
+    q: "What happens if an OS or node operator tries to read model input data from inside a running TEE?",
+    opts: [
+      "They can read it with root access",
+      "The TEE's memory encryption hardware blocks all external access — the OS, hypervisor, and operator all see only ciphertext. This is enforced at the CPU level, not software.",
+      "They need a special API key",
+      "The data is deleted after reading"
+    ],
+    ans: 1,
+    explain: "Intel SGX and AMD SEV encrypt enclave memory pages with keys that never leave the CPU hardware. Even with root/kernel access, the OS sees only ciphertext. You can run sensitive AI inference (medical data, trading strategies, personal data) on an untrusted third-party node with provable data privacy."
+  },
+  {
+    category: "Funding", color: "rgba(255,230,0,.12)", textColor: "#FFE600",
+    q: "OpenGradient was formerly Vanna Laboratories. What does the rebrand to 'OpenGradient' communicate?",
+    opts: [
+      "The founders originally built a wine app",
+      "The rename signals a pivot toward open, permissionless infrastructure — 'Open' means accessible/decentralized, 'Gradient' is core ML vocabulary (gradient descent trains every neural network)",
+      "They ran out of money and rebranded",
+      "The original founding team left"
+    ],
+    ans: 1,
+    explain: "'Vanna' suggests a specific product. 'OpenGradient' is an infrastructure brand — 'Open' = permissionless/decentralized, 'Gradient' = ML-native (gradient descent trains all neural networks). The rename is a mission statement: not a product, but the open infrastructure layer for all AI on blockchain. Founded NYC, 2023."
+  },
+  {
+    category: "Developer SDK", color: "rgba(0,212,255,.15)", textColor: "#00D4FF",
+    q: "If a Solidity contract must reject a trade when AI confidence falls below 85%, how does OG make this trustlessly enforceable on-chain?",
+    opts: [
+      "Manually check the score off-chain and submit it",
+      "The contract calls OG's verified inference interface, receives the confidence score WITH a cryptographic proof, verifies the proof on-chain, then enforces the threshold — no trusted intermediary at any step",
+      "Use a multisig wallet to approve each trade",
+      "Call an external API in the constructor"
+    ],
+    ans: 1,
+    explain: "Verifiable AI in action: (1) Solidity: require(verifiedScore >= 85). (2) OG runs model, produces score + proof. (3) Contract calls OG verifier, proof checked by EVM. (4) Verified score compared to threshold. (5) Trade executes or reverts — entirely trustless. No one can fake a high-confidence score because the proof is checked by the EVM itself."
+  },
 ];
