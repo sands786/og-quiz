@@ -23,7 +23,7 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 @keyframes cfall{0%{transform:translateY(-20px) rotate(0);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
 
 /* ── CREATOR INTRO ── */
-.creator-intro{display:inline-flex;align-items:center;gap:14px;padding:14px 22px;background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(184,41,247,.08));border:1px solid rgba(0,212,255,.25);border-radius:16px;margin-bottom:20px;text-align:left;}
+.creator-intro{display:inline-flex;align-items:center;gap:14px;padding:14px 22px;background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(184,41,247,.08));border:1px solid rgba(0,212,255,.25);border-radius:16px;margin-bottom:16px;text-align:left;max-width:480px;}
 .ci-avatar{font-size:36px;line-height:1;}
 .ci-name{font-size:18px;font-weight:900;letter-spacing:-.03em;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px;}
 .ci-tagline{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
@@ -171,7 +171,7 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 
 <!-- ═══════════════ LANDING ═══════════════ -->
 <div class="page" id="landing">
-  <div class="hero">
+  <div class="hero" style="display:flex;flex-direction:column;align-items:center;">
     <div class="hglow"></div><div class="orb1"></div><div class="orb2"></div>
     <div class="creator-intro">
     <div class="ci-avatar">⛩️</div>
@@ -299,17 +299,54 @@ let ti=null,tl=30;
 
 async function connectWallet(){
   const b=document.getElementById('cbtn'),c=document.getElementById('wst');
-  if(!window.ethereum){showChip(c,'❌ MetaMask not detected. Install from metamask.io',1);return;}
-  b.disabled=1;b.textContent='⏳ Connecting...';
+
+  // Check MetaMask installed
+  if(typeof window.ethereum==='undefined'||!window.ethereum.isMetaMask){
+    showChip(c,'❌ MetaMask not found. <a href="https://metamask.io/download/" target="_blank" style="color:var(--cyan)">Install MetaMask →</a>',1);
+    b.disabled=0; resetConnectBtn(); return;
+  }
+
+  // Check HTTPS (MetaMask won't work on file:// or http://)
+  if(location.protocol==='file:'){
+    showChip(c,'❌ Open this page via HTTPS (Vercel/localhost), not as a local file',1);
+    b.disabled=0; resetConnectBtn(); return;
+  }
+
+  b.disabled=1; b.textContent='⏳ Opening MetaMask...';
+  showChip(c,'👆 Check for the MetaMask popup — it may be behind your browser window',0);
+
+  // Timeout so button doesn't get stuck if user ignores popup
+  const timeout = setTimeout(()=>{
+    b.disabled=0; resetConnectBtn();
+    showChip(c,'⏱ Timed out. Did MetaMask popup appear? Try again.',1);
+  }, 30000);
+
   try{
+    // Wake up MetaMask first (helps when extension is sleeping)
+    try{ await window.ethereum.request({method:'wallet_requestPermissions',params:[{eth_accounts:{}}]}); }catch(_){}
+
     const a=await ethereum.request({method:'eth_requestAccounts'});
-    addr=a[0];const s=addr.slice(0,6)+'...'+addr.slice(-4);
+    clearTimeout(timeout);
+    addr=a[0];
+    const s=addr.slice(0,6)+'...'+addr.slice(-4);
     showChip(c,'✓ Connected: '+s,0);
-    b.textContent='✓ '+s;b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';b.style.color='#050508';
+    b.textContent='✓ '+s;
+    b.style.background='linear-gradient(135deg,#00FF9D,#00D4FF)';
+    b.style.color='#050508';
     document.getElementById('s2').classList.remove('hidden');
-    toast('Wallet connected! Now switch to OG Testnet.');
+    toast('✓ Wallet connected! Now switch to OG Testnet.');
     ethereum.on('accountsChanged',x=>{if(!x.length)location.reload();else addr=x[0];});
-  }catch(e){b.disabled=0;b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg> Connect MetaMask';showChip(c,e.code===4001?'❌ Rejected':'❌ '+e.message,1);}
+  }catch(e){
+    clearTimeout(timeout);
+    b.disabled=0; resetConnectBtn();
+    if(e.code===4001) showChip(c,'❌ You rejected the connection request',1);
+    else if(e.code===-32002) showChip(c,'⚠️ MetaMask is already waiting — check the extension icon in your browser toolbar',1);
+    else showChip(c,'❌ '+e.message,1);
+  }
+}
+
+function resetConnectBtn(){
+  document.getElementById('cbtn').innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 10h20" stroke="currentColor" stroke-width="2"/></svg> Connect MetaMask';
 }
 
 async function switchNet(){
