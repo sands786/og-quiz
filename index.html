@@ -22,6 +22,16 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 .cf{position:absolute;border-radius:2px;animation:cfall linear forwards;}
 @keyframes cfall{0%{transform:translateY(-20px) rotate(0);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
 
+/* ── CREATOR INTRO ── */
+.creator-intro{display:inline-flex;align-items:center;gap:14px;padding:14px 22px;background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(184,41,247,.08));border:1px solid rgba(0,212,255,.25);border-radius:16px;margin-bottom:20px;text-align:left;}
+.ci-avatar{font-size:36px;line-height:1;}
+.ci-name{font-size:18px;font-weight:900;letter-spacing:-.03em;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px;}
+.ci-tagline{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px;}
+.ci-links{display:flex;gap:8px;flex-wrap:wrap;}
+.ci-link{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:600;text-decoration:none;transition:all .3s;}
+.ci-tw{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);color:#e8e8f0;}.ci-tw:hover{border-color:var(--cyan);color:var(--cyan);}
+.ci-dc{background:rgba(88,101,242,.15);border:1px solid rgba(88,101,242,.35);color:#8b9cf7;}.ci-dc:hover{border-color:#8b9cf7;color:white;}
+
 /* ── LANDING ── */
 .page{position:relative;z-index:10;}
 .hero{text-align:center;padding:60px 24px 40px;position:relative;overflow:hidden;}
@@ -163,7 +173,24 @@ html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--black)
 <div class="page" id="landing">
   <div class="hero">
     <div class="hglow"></div><div class="orb1"></div><div class="orb2"></div>
-    <div class="eyebrow"><span class="edot"></span>OpenGradient Knowledge Challenge</div>
+    <div class="creator-intro">
+    <div class="ci-avatar">⛩️</div>
+    <div class="ci-text">
+      <div class="ci-name">Master Shifu</div>
+      <div class="ci-tagline">presents the OpenGradient Knowledge Challenge</div>
+      <div class="ci-links">
+        <a href="https://twitter.com/husnain50376345" target="_blank" class="ci-link ci-tw">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.906-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          @husnain50376345
+        </a>
+        <a href="https://discord.com/users/alpha_53645" target="_blank" class="ci-link ci-dc">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.042-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          alpha_53645
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="eyebrow"><span class="edot"></span>OpenGradient Knowledge Challenge</div>
     <h1><span class="gtext">OG Quiz</span></h1>
     <p class="hsub">Test your knowledge of OpenGradient — the decentralized AI infrastructure powering verifiable on-chain AI. 25 questions. Earn your rank. Pay 0.1 $OPG testnet tokens to unlock.</p>
     <div class="badges">
@@ -412,31 +439,131 @@ function confetti(){
 })();
 
 const QS=[
-  {cat:"Basics",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What is OpenGradient's primary mission?",o:["Build centralized AI cloud services","Create the first decentralized, verifiable AI infrastructure on-chain","Develop a new programming language for AI","Compete with OpenAI's GPT models"],a:1,ex:"OpenGradient's mission is to democratize AI by building the first permissionless, decentralized platform for AI model hosting, secure inference, agent execution, and dApp deployment — all fully verifiable on-chain."},
-  {cat:"Funding",bg:"rgba(255,230,0,.12)",tc:"#FFE600",q:"How much did OpenGradient raise in its seed round in October 2024?",o:["$2.5 million","$5 million","$8.5 million","$15 million"],a:2,ex:"OpenGradient raised $8.5M in a seed round led by a16z CSX with Coinbase Ventures, SV Angel, Foresight Ventures, and notable angel investors."},
-  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Which accelerator selected OpenGradient for its Fall 2024 cohort?",o:["Y Combinator","a16z CSX (Crypto Startup Accelerator)","Binance Labs","Draper Associates"],a:1,ex:"OpenGradient was selected for the a16z Crypto Startup Accelerator (CSX) Fall 2024 program in NYC. a16z CSX invests at least $500K in each selected company."},
-  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"What does HACA stand for in OpenGradient's architecture?",o:["High-Accuracy Chain Architecture","Heterogeneous AI Compute Architecture","Hybrid Autonomous Computing Array","Hierarchical AI Contract Architecture"],a:1,ex:"HACA stands for Heterogeneous AI Compute Architecture. It routes AI inference to the right hardware based on security and speed requirements."},
-  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"What technology provides cryptographic proof that AI inference ran inside a secure, unmodified enclave?",o:["Zero-Knowledge Proofs only","Trusted Execution Environments (TEE)","Homomorphic Encryption","Multi-Party Computation"],a:1,ex:"Trusted Execution Environments (TEE) are hardware-isolated secure enclaves that cryptographically sign every AI output, proving the model ran unmodified and untampered."},
-  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"What is the Chain ID of OpenGradient's testnet?",o:["1337","8453","10744","42161"],a:2,ex:"OpenGradient Testnet has Chain ID 10744 (0x29F8 in hex). The RPC URL is https://eth-devnet.opengradient.ai and the native currency symbol is ETH."},
-  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"What type of blockchain does OpenGradient use?",o:["Solana-compatible","Bitcoin Layer 2","EVM-compatible (Ethereum Virtual Machine)","Cosmos-based"],a:2,ex:"OpenGradient runs on an EVM-compatible blockchain, meaning developers can call AI models directly from Solidity smart contracts."},
-  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Which co-inventor of the Transformer architecture is an angel investor in OpenGradient?",o:["Yann LeCun","Geoffrey Hinton","Illia Polosukhin (NEAR founder)","Andrew Ng"],a:2,ex:"Illia Polosukhin, co-founder of NEAR Protocol, co-invented the Transformer architecture powering all modern LLMs — and is an angel investor in OpenGradient."},
-  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Balaji Srinivasan, an angel investor in OpenGradient, was previously best known as:",o:["CTO of Google","CTO of Coinbase","CEO of Ripple","Founder of Ethereum"],a:1,ex:"Balaji Srinivasan is the former CTO of Coinbase and author of 'The Network State'. He is one of OpenGradient's high-profile angel investors."},
-  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is MemSync in OpenGradient's ecosystem?",o:["A blockchain wallet","A long-term memory layer for AI with persistent context management","A DEX for tokens","A GPU rental marketplace"],a:1,ex:"MemSync is OpenGradient's long-term memory layer for AI. It provides a REST API for persistent context, fact extraction, semantic search — with cryptographic proof of authenticity."},
-  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is BitQuant in the OpenGradient ecosystem?",o:["A Bitcoin trading bot","An open-source AI agent framework for quantitative trading using on-chain ML models","A stablecoin","A block explorer"],a:1,ex:"BitQuant is OpenGradient's open-source AI agent framework for quant trading using on-chain ML models for market analytics and autonomous trade execution."},
-  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"In OpenGradient's HACA, what do Inference Nodes primarily do?",o:["Verify transaction signatures","Store blockchain state","Run AI model inference with specialized GPU hardware","Distribute token rewards"],a:2,ex:"Inference nodes are specialized for running AI models on GPU hardware. This separation of inference from verification is a core HACA design principle."},
-  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"Which verification methods does OpenGradient's HACA support?",o:["Only TEE-based","Only Zero-Knowledge Proofs","A spectrum: TEE attestations, ZKML, and cryptoeconomic security","Only on-chain re-execution"],a:2,ex:"HACA supports a full spectrum: TEE attestations, ZKML for mathematical certainty, and cryptoeconomic security. You can mix methods within a single transaction."},
-  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What programming language is the OpenGradient SDK currently available in?",o:["JavaScript only","Rust","Python (TypeScript in development)","Go"],a:2,ex:"The OpenGradient SDK is available for Python with a TypeScript version in development. It includes a Python library and CLI tool called 'opengradient'."},
-  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What is AlphaSense in OpenGradient's developer stack?",o:["A financial data API","A tool that wraps verifiable AI workflows to give AI agents powerful on-chain signals","A hardware monitoring dashboard","A smart contract auditing tool"],a:1,ex:"AlphaSense wraps verifiable AI workflows and exposes them as tools for AI agents — giving your agent superpowers with on-chain verified signals."},
-  {cat:"Basics",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What core problem does OpenGradient solve that centralized AI providers cannot?",o:["Faster response times","Complete cryptographic verifiability of every AI inference — proof outputs weren't tampered with","Lower API pricing","Better model quality"],a:1,ex:"With centralized AI you can't verify outputs. OpenGradient provides cryptographic proof of every single inference — something no centralized provider offers."},
-  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"What is the RPC URL for OpenGradient's developer testnet?",o:["https://rpc.opengradient.ai","https://eth-devnet.opengradient.ai","https://testnet.opengradient.io","https://api.og-chain.net"],a:1,ex:"The OpenGradient testnet RPC URL is https://eth-devnet.opengradient.ai — used when adding OG to MetaMask or initializing the Python SDK."},
-  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is the OpenGradient Model Hub?",o:["A GPU marketplace","A community model registry to discover, deploy, and monetize open-source AI models on-chain","An NFT collection","A smart contract audit service"],a:1,ex:"The Model Hub is OG's decentralized model repository. Think Hugging Face — but on-chain, permissionless, and with ownership attribution."},
-  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",q:"Sandeep Nailwal, an angel investor in OpenGradient, co-founded which blockchain project?",o:["Solana","Avalanche","Polygon","Arbitrum"],a:2,ex:"Sandeep Nailwal is co-founder of Polygon, one of Ethereum's largest L2 ecosystems. He invested in OpenGradient's seed round."},
-  {cat:"Technology",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",q:"Why does OpenGradient NOT ask every validator to re-run AI inferences?",o:["To save storage","AI inference is computationally expensive, requires GPUs, and is non-deterministic — making full re-execution impractical","Copyright concerns","Would slow token transfers"],a:1,ex:"Unlike simple transactions, AI inference costs orders of magnitude more, needs specialized GPUs, and is non-deterministic. Dedicated inference nodes run models; full nodes verify proofs."},
-  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What is x402 in OpenGradient's ecosystem?",o:["An internal error code","A payments protocol for the internet built on HTTP enabling verifiable LLM inference with payment flows","A transaction type","A smart contract name"],a:1,ex:"x402 is an HTTP-based payments protocol (originally from Coinbase) that OpenGradient uses as a gateway for verifiable LLM inference with payment flows built in."},
-  {cat:"Products",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",q:"What is Neuro Stack in OpenGradient?",o:["A GPU hardware stack","Technology to spin up your own sovereign AI-enabled blockchain for agents or apps","A frontend UI kit","A staking mechanism"],a:1,ex:"Neuro Stack lets anyone deploy their own sovereign AI-enabled blockchain — ideal for building specialized chains for AI agents or AI-powered applications."},
-  {cat:"Basics",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"What was OpenGradient's previous company name before rebranding?",o:["DeepChain Labs","Vanna Laboratories","Gradient Protocol","ChainML Inc"],a:1,ex:"OpenGradient was formerly known as Vanna Laboratories before rebranding. It was founded in New York City in 2023."},
-  {cat:"Developers",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",q:"The OpenGradient Agent Stack is compatible with which popular agent frameworks?",o:["Only OG's own framework","LangChain and OpenAI Swarm","TensorFlow and PyTorch","AutoGPT only"],a:1,ex:"The OG Agent Stack is compatible with LangChain and OpenAI Swarm, making it a plug-in replacement for centralized execution in existing agent setups."},
-  {cat:"Blockchain",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",q:"Which on-chain use cases does OpenGradient explicitly enable through verifiable AI?",o:["Only chatbots","Risk management, AMM optimization, AI agents, Sybil resistance, DeFi mechanism design — all cryptographically proven","Only image generation","Only text summarization"],a:1,ex:"OpenGradient enables high-stakes use cases: risk management, ML optimization, AI agents, Sybil resistance, DeFi, AMM optimization — all with cryptographic verifiability built-in."},
+  {cat:"Architecture",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",
+   q:"In HACA, what fundamental problem does OpenGradient solve that prevents standard blockchains from running AI natively?",
+   o:["Gas fees are too high for compute","AI inference is non-deterministic, GPU-dependent, and orders of magnitude more expensive than regular transactions — making full re-execution by all validators impossible","Smart contracts can't store large files","Blockchains don't support floating point math"],
+   a:1,ex:"Standard blockchains assume every validator can cheaply re-execute any transaction. AI inference breaks all three assumptions: it's non-deterministic, requires specialized GPU hardware, and costs 10,000x more than a typical transaction. HACA solves this by separating inference from verification."},
+
+  {cat:"Architecture",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",
+   q:"HACA uses a 'verification spectrum' — what are the three trust tiers it supports, ordered from fastest to most mathematically certain?",
+   o:["HTTP → IPFS → On-chain","Cryptoeconomic security → TEE attestations → ZKML proofs","Random sampling → Majority vote → Full re-execution","Optimistic → Pessimistic → Neutral"],
+   a:1,ex:"HACA's verification spectrum: (1) Cryptoeconomic security — stake-based, fastest; (2) TEE attestations — hardware-isolated enclaves with cryptographic signatures; (3) ZKML proofs — zero-knowledge mathematical certainty, slowest but fully trustless. You can mix tiers within a single transaction."},
+
+  {cat:"TEE",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",
+   q:"When an OpenGradient inference node uses a TEE, what exactly does the attestation prove to the verifier?",
+   o:["That the node has enough GPU memory","That the exact model binary ran inside an unmodified, hardware-isolated enclave and produced the signed output — no tampering possible","That the transaction fee was paid","That the model weights are open source"],
+   a:1,ex:"A TEE attestation is a hardware-signed certificate. It proves: (a) the specific model binary was loaded, (b) it ran inside a genuine Intel SGX or AMD SEV enclave, (c) the enclave was not modified, and (d) the output was produced by that exact computation. Even the node operator cannot see or tamper with the execution."},
+
+  {cat:"TEE",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",
+   q:"What is the key tradeoff when choosing TEE verification over ZKML in OpenGradient's HACA?",
+   o:["TEE is cheaper but slower","TEE relies on trusting hardware manufacturers (Intel/AMD), while ZKML is mathematically trustless but has much higher computational overhead","TEE only works for image models","ZKML requires MetaMask, TEE does not"],
+   a:1,ex:"TEE's trust assumption is hardware-based: you trust that Intel SGX or AMD SEV hasn't been compromised. ZKML requires zero trust — the proof is mathematically verifiable by anyone — but generating a ZK proof for a large neural network can take minutes to hours, making it impractical for real-time inference today."},
+
+  {cat:"ZKML",bg:"rgba(184,41,247,.15)",tc:"#B829F7",
+   q:"Why is ZKML (Zero-Knowledge Machine Learning) technically difficult to apply to large transformer models like GPT?",
+   o:["Transformers use Python, ZK circuits use Rust","ZK proof generation scales poorly with model size — a billion-parameter model would take hours to prove, and attention mechanisms are notoriously hard to express as arithmetic circuits","ZK proofs can't handle floating point","OpenGradient doesn't support ZKML yet"],
+   a:1,ex:"ZKML requires expressing every model computation as an arithmetic circuit. Transformers involve billions of floating-point multiplications, softmax (requires division), and layer norm — all extremely expensive to prove in ZK. Current ZKML is practical for small CNNs and simple models, but transformer-scale proofs remain an active research frontier."},
+
+  {cat:"Developer SDK",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",
+   q:"What does the OpenGradient Python SDK's `run_inference()` function return beyond just the model output?",
+   o:["Only the text response","The model output plus a cryptographic proof object (TEE attestation or ZK proof) that can be submitted on-chain to verify the inference happened correctly","A gas estimate","A JSON schema of the model"],
+   a:1,ex:"This is OG's core value prop. `run_inference()` returns both the result AND a verifiable proof. The proof can be an SGX attestation quote, a ZKML proof, or a cryptoeconomic commitment — depending on which verification tier you selected. You can then pass this proof to a smart contract to trustlessly verify on-chain."},
+
+  {cat:"Developer SDK",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",
+   q:"In the OpenGradient SDK, what does `og.contract.call_with_inference()` enable that a standard Ethereum call cannot do?",
+   o:["Call contracts on other chains","Execute a Solidity function whose inputs include live AI inference results — verified on-chain atomically in the same transaction","Pay gas in $OPG tokens","Deploy contracts without Solidity"],
+   a:1,ex:"This is OG's killer feature for DeFi and dApps. A single atomic transaction can: (1) run an AI model on an inference node, (2) get a verifiable proof, (3) pass the verified output directly as a parameter to a Solidity function. The smart contract can trust the AI output because the proof was verified on-chain in the same tx."},
+
+  {cat:"Agents",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",
+   q:"What makes OpenGradient's on-chain AI agents fundamentally different from off-chain agents like LangChain AutoGPT?",
+   o:["They are faster","Every reasoning step, tool call, and decision the agent makes is cryptographically verifiable and recorded on-chain — creating an auditable, tamper-proof agent execution trail","They use a different programming language","They cost less to run"],
+   a:1,ex:"Off-chain agents (LangChain, AutoGPT) run on centralized servers — you have to trust the operator didn't tamper with the agent's behavior. OG agents run with TEE or ZK verification on every inference step. The entire agent execution — every prompt, every tool call, every decision — is verifiable and auditable on-chain. Critical for autonomous DeFi agents managing real funds."},
+
+  {cat:"Agents",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",
+   q:"AlphaSense in OpenGradient wraps AI workflows as agent tools. What does this enable for a DeFi trading agent?",
+   o:["It enables the agent to buy NFTs","The agent can invoke verified on-chain ML models (price prediction, risk scoring, sentiment analysis) as trusted tool calls — results are cryptographically proven, not just API responses","It gives the agent a UI","It converts Python to Solidity"],
+   a:1,ex:"AlphaSense turns verifiable AI inference into composable agent tools. A DeFi agent using AlphaSense can call a price prediction model and get a signed, on-chain-verifiable result — not a response from a black-box API. The agent's fund manager, DAO, or smart contract can audit exactly which model produced which signal and verify it wasn't tampered with."},
+
+  {cat:"MemSync",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",
+   q:"What cryptographic property does MemSync add to AI agent memory that standard vector databases like Pinecone cannot provide?",
+   o:["Faster retrieval","Every memory read and write is signed and verifiable — you can cryptographically prove that a specific fact was stored at a specific time and retrieved unmodified","It stores more data","It uses less RAM"],
+   a:1,ex:"Pinecone and similar vector DBs are trusted third parties — you can't prove what they stored or returned. MemSync wraps memory operations with cryptographic proofs: you can prove to a smart contract that your agent's memory at time T contained fact X, and that the retrieved context was not modified between storage and retrieval. Essential for accountable autonomous agents."},
+
+  {cat:"BitQuant",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",
+   q:"BitQuant is OG's quant trading agent framework. What is the key risk-management property it has over traditional quant strategies running on AWS?",
+   o:["Lower latency","The trading model's signals are verifiable on-chain — LPs or DAO voters can audit that the bot actually followed the specified strategy and model, not a secretly modified one","It uses more data sources","It trades on more exchanges"],
+   a:1,ex:"The biggest risk in quant trading funds is strategy drift — the operator changes the model or strategy without telling LPs. BitQuant's verifiable inference means every signal the bot acts on comes with a cryptographic proof of which model produced it. LPs can verify the bot is running the agreed-upon strategy, not a secretly substituted one."},
+
+  {cat:"EVM Integration",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",
+   q:"How does a Solidity smart contract on OpenGradient actually consume an AI inference result trustlessly?",
+   o:["It calls an Oracle like Chainlink","It reads from a centralized API","The inference node submits both the result and a cryptographic proof on-chain. The OG verifier contract checks the proof, and only if valid, passes the result to your smart contract — all atomically","The developer hardcodes the result"],
+   a:2,ex:"OG has a Verifier smart contract deployed on-chain. When your contract needs AI: (1) inference node runs the model, (2) produces a result + proof, (3) submits both to the Verifier contract, (4) Verifier checks the proof (TEE attestation or ZK), (5) if valid, your contract receives the verified output. No oracle, no trusted third party."},
+
+  {cat:"EVM Integration",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",
+   q:"What does it mean that OpenGradient is 'EVM-compatible' in the context of AI inference?",
+   o:["You can only use MetaMask","Existing Ethereum smart contracts can call OG's AI inference directly using familiar Solidity patterns, without rewriting contracts or learning a new VM","It runs Ethereum 1.0 only","EVM compatibility means slower transactions"],
+   a:1,ex:"EVM compatibility means any Ethereum developer can use OG immediately. You write Solidity as normal, but instead of calling a Chainlink oracle, you call OG's inference interface. The AI result arrives verified within the same transaction. Your existing Hardhat/Foundry tooling, testing frameworks, and deployment scripts all work unchanged."},
+
+  {cat:"Funding",bg:"rgba(255,230,0,.12)",tc:"#FFE600",
+   q:"Beyond the $8.5M seed raise, what strategic significance did a16z CSX selection give OpenGradient?",
+   o:["Free office space only","Access to a16z's crypto portfolio network, co-investment signals to other funds, and validation from the most prominent crypto-native VC — effectively a quality stamp that attracted Coinbase Ventures, SV Angel, and the angel investors","A guaranteed token listing","Priority hiring at a16z companies"],
+   a:1,ex:"a16z CSX is fiercely selective. Being chosen signals to the entire crypto VC ecosystem that a16z's AI+crypto thesis aligns with OpenGradient's approach. This directly facilitated co-investment from Coinbase Ventures (the exchange's strategic fund) and SV Angel, and made it credible for Illia Polosukhin and Balaji to invest as angels."},
+
+  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",
+   q:"Illia Polosukhin co-authored 'Attention Is All You Need' — the Transformer paper. Why is his investment in OG strategically significant beyond just capital?",
+   o:["He provides cheap GPU access","As co-inventor of the architecture powering all modern LLMs, his endorsement signals technical credibility at the foundational AI research level — and his NEAR Protocol experience in scaling decentralized compute directly maps to OG's infrastructure thesis","He is a famous YouTuber","He manages OpenGradient's Discord"],
+   a:1,ex:"'Attention Is All You Need' (2017, Google Brain) invented the Transformer. Every major LLM — GPT-4, Claude, Gemini — runs on this architecture. Illia investing means the person who literally invented the foundation of modern AI believes that decentralized, verifiable inference is the correct path forward. His NEAR background also means he understands L1 infrastructure at scale."},
+
+  {cat:"Investors",bg:"rgba(184,41,247,.15)",tc:"#B829F7",
+   q:"Sandeep Nailwal (Polygon co-founder) investing in OpenGradient is significant because Polygon solved a specific Ethereum scaling problem. What parallel does this draw to OG's mission?",
+   o:["Both use the same codebase","Polygon solved Ethereum's throughput limitations for general transactions; OpenGradient is solving Ethereum's inability to run verifiable AI compute — a structurally analogous problem at a higher compute layer","Both are based in India","Polygon will merge with OpenGradient"],
+   a:1,ex:"Polygon's thesis: Ethereum L1 can't scale general transactions → build an L2. OG's thesis: EVM can't run AI inference trustlessly → build a specialized AI compute layer on top of EVM. Sandeep's investment signals recognition of this structural parallel — the same playbook that made Polygon successful applied to the AI compute problem."},
+
+  {cat:"x402 Protocol",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",
+   q:"The x402 protocol OpenGradient uses originated at Coinbase. What problem does it solve for AI inference payments?",
+   o:["It makes AI faster","It implements HTTP 402 (Payment Required) as a machine-native payment protocol — an AI agent or HTTP client can pay for inference automatically within the HTTP request, without a human approving each transaction","It encrypts model weights","It reduces gas costs"],
+   a:1,ex:"HTTP 402 was reserved in 1996 for 'Payment Required' but never implemented. x402 makes it real: any HTTP server can require a micro-payment before serving a response. For AI, this means an autonomous agent can pay for inference calls programmatically — no human approval, no subscription, no API key. Pure pay-per-inference, machine-to-machine, using on-chain payments."},
+
+  {cat:"Neuro Stack",bg:"rgba(184,41,247,.15)",tc:"#B829F7",
+   q:"What is the architectural purpose of Neuro Stack — why would a developer choose it over just using OpenGradient's mainnet?",
+   o:["It is cheaper","Neuro Stack lets you deploy a sovereign AI-enabled appchain with customized inference rules, validator sets, token economics, and governance — while inheriting OG's AI compute primitives. Use it when you need application-specific control","It has better graphics","It only works with Python"],
+   a:1,ex:"Think of Neuro Stack like Cosmos SDK but for AI-first chains. Instead of sharing OpenGradient's validator set and block space, you spin up a dedicated chain with your own: token, governance, inference verification policy, and fee structure. But you get OG's battle-tested AI inference layer for free. Ideal for AI agent DAOs, vertical-specific AI networks, or high-throughput AI apps."},
+
+  {cat:"Model Hub",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",
+   q:"What is the key economic difference between publishing a model on OpenGradient's Model Hub versus on Hugging Face?",
+   o:["OG models are faster to download","On OG's Model Hub, the model's on-chain identity means every inference call can be attribution-tracked and the creator can earn fees automatically — Hugging Face has no native payment or verifiable attribution layer","Hugging Face charges more","OG Model Hub only hosts small models"],
+   a:1,ex:"Hugging Face is a hosting platform — no native payment rails, no on-chain attribution. OG's Model Hub registers models as on-chain entities with a unique identifier. Every time someone pays to run inference on your model, the payment flows to your address automatically via smart contract. Model creators can build sustainable revenue streams from their work without intermediaries."},
+
+  {cat:"Devnet",bg:"rgba(255,0,160,.12)",tc:"#FF00A0",
+   q:"When adding OpenGradient Testnet to MetaMask manually, what specific hexadecimal value must you enter for Chain ID?",
+   o:["0x1 (Ethereum Mainnet)","0x29F8 (decimal: 10744)","0xA (Polygon)","0x38 (BSC)"],
+   a:1,ex:"OpenGradient Testnet Chain ID is 10744 decimal = 0x29F8 hex. MetaMask accepts both formats but the hex form is 0x29F8. The full config: RPC URL = https://eth-devnet.opengradient.ai, Symbol = ETH, Explorer = https://explorer.opengradient.ai. Getting this wrong will cause all transactions to fail silently."},
+
+  {cat:"Architecture",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",
+   q:"Why can't OpenGradient simply use Chainlink or Pyth oracles to bring AI results on-chain instead of building its own infrastructure?",
+   o:["Chainlink is too expensive","Oracles report external data (prices, weather) via trusted node committees — they don't execute arbitrary AI models and cannot provide cryptographic proof that a specific model ran on specific inputs. OG's inference nodes run the model and generate the proof, not just report a result","Chainlink doesn't support Solidity","OpenGradient has a partnership with Pyth"],
+   a:1,ex:"Chainlink nodes are data reporters — they fetch external data and reach consensus on its value. They can't prove WHAT code ran or HOW a result was computed. OG's inference nodes run the actual model inside a TEE or generate a ZK proof. The difference: oracles say 'trust us, the price is $X'. OG says 'here's a mathematical proof that model M with inputs I produced output O'."},
+
+  {cat:"Agents",bg:"rgba(255,107,0,.12)",tc:"#FF6B00",
+   q:"In OpenGradient's agent framework, what does 'composable verified inference' mean in practice for a DeFi protocol?",
+   o:["Agents can compose music","Multiple verified AI inference calls can be chained together — e.g., risk model → portfolio optimizer → execution agent — where each step's output is cryptographically proven before the next step consumes it","Agents can compose NFTs","It means parallel execution"],
+   a:1,ex:"A DeFi protocol might need: Step 1 — run a market risk model (TEE-verified). Step 2 — feed verified risk output into a portfolio optimizer (ZKML-proven). Step 3 — pass verified allocation to an execution agent. Each step's proof is checked before the next step runs. This creates an auditable, trustless AI pipeline — impossible with any combination of existing oracle or off-chain agent tools."},
+
+  {cat:"TEE",bg:"rgba(0,255,157,.12)",tc:"#00FF9D",
+   q:"What happens inside a TEE inference node if the operating system or even the node operator tries to read the model's input data during execution?",
+   o:["They can read it with root access","The TEE's memory encryption hardware prevents any external access — the OS, hypervisor, and node operator are all excluded from the enclave's memory. The hardware enforces this at the CPU level, not software","They need a special API key","The data is deleted after reading"],
+   a:1,ex:"This is the core hardware security property of TEEs (Intel SGX, AMD SEV). The enclave's memory pages are encrypted by the CPU itself with keys that never leave the hardware. Even with root/kernel access, the OS sees only ciphertext. This means you can run sensitive AI inference (medical data, trading strategies, personal data) on an untrusted third-party node with provable data privacy."},
+
+  {cat:"Funding",bg:"rgba(255,230,0,.12)",tc:"#FFE600",
+   q:"OpenGradient was formerly Vanna Laboratories. What does this corporate history tell us about the founders' original vision versus current direction?",
+   o:["The founders originally built a wine app","The rename from Vanna Labs to OpenGradient signals a deliberate pivot toward open, permissionless infrastructure rather than a closed product — 'Open' and 'Gradient' together communicate both accessibility and AI (gradient descent)","They ran out of money","The original team left"],
+   a:1,ex:"'Vanna' suggests a specific product persona. 'OpenGradient' is an infrastructure brand — 'Open' signals permissionless/decentralized, 'Gradient' is core ML vocabulary (gradient descent trains all neural networks). The rename is a mission statement: we're not building a product, we're building the open infrastructure layer for all AI on blockchain. Founded 2023, NYC, pre-seed → a16z CSX → $8.5M seed in 14 months."},
+
+  {cat:"Architecture",bg:"rgba(0,212,255,.15)",tc:"#00D4FF",
+   q:"What does 'heterogeneous' mean in HACA (Heterogeneous AI Compute Architecture) — specifically what resources are heterogeneous?",
+   o:["The team members are from different countries","The compute resources are heterogeneous — HACA routes inference to different hardware (CPU nodes, GPU clusters, TEE enclaves) and different verification methods (cryptoeconomic, TEE, ZKML) based on the inference job's requirements","The smart contracts use different languages","The validators have different token stakes"],
+   a:1,ex:"'Heterogeneous' contrasts with homogeneous systems where every node does the same thing. HACA's compute layer has: lightweight CPU nodes (fast, cheap, for simple models), GPU clusters (expensive, needed for LLMs), TEE-enabled nodes (privacy + attestation), and ZKML prover nodes (mathematically certain, slow). The scheduler routes each inference to the optimal combination based on cost, latency, and verification requirements specified by the dApp."},
+
 ];
 </script>
 </body>
